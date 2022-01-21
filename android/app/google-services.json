@@ -1,0 +1,47 @@
+{
+  "project_info": {
+    "project_number": "467155727487",
+    "project_id": "learnable-d5272",
+    "storage_bucket": "learnable-d5272.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:467155727487:android:ad0b51a08bf4664c1b3b4a",
+        "android_client_info": {
+          "package_name": "com.example.learnable"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "467155727487-di78ltgg2fhva821jn20c6qiclf9vtk8.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.example.learnable",
+            "certificate_hash": "42fc4d0722a6d65f84d1e25d540cf26de1d3f54e"
+          }
+        },
+        {
+          "client_id": "467155727487-20ei76u1ec0f5d9p9t04buv9mct3ohd9.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAlhTes0qrUKsntnAUBhzAwWHNw-zCCszw"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "467155727487-20ei76u1ec0f5d9p9t04buv9mct3ohd9.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
