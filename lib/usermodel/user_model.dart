@@ -5,8 +5,9 @@ class UserModel {
   String? firstname;
   String? lastname;
   String? email;
+  bool? isinstructor = false;
 
-  UserModel({this.uid, this.firstname, this.lastname, this.email});
+  UserModel({this.uid, this.firstname, this.lastname, this.email, this.isinstructor});
 
   //recieving data from the server
 
@@ -16,7 +17,8 @@ class UserModel {
         uid: map('uid'),
         firstname: map('First Name'),
         lastname: map('Last Name'),
-        email: map('Email'));
+        email: map('Email'),
+        isinstructor: map('Isinstructor'));
   }
 
   //sending data to the server
@@ -26,35 +28,12 @@ class UserModel {
       'uid': uid,
       'First Name': firstname,
       'Last Name': lastname,
-      'Email': email
+      'Email': email,
+      'Isinstructor': isinstructor
     };
   }
 }
 
 
 
-class Instructors {
-  String? uid;
-  String? name;
-  String? surname;
-  String? phonenumber;
 
-  Instructors({this.name, this.surname, this.phonenumber, this.uid});
-
-  factory Instructors.fromMap(map) {
-    return Instructors(
-        uid: map('uid'),
-        name: map('Name'),
-        surname: map('Surname'),
-        phonenumber: map('Phone Number'));
-  }
-
-  Map<String, dynamic> tomap() {
-    return {
-      'uid': uid,
-      'Name': name,
-      'Surname': surname,
-      'Phone Number': phonenumber
-    };
-  }
-}

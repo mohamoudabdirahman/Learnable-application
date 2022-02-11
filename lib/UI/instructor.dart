@@ -1,148 +1,79 @@
 // ignore_for_file: prefer_const_constructors, prefer_const_literals_to_create_immutables
 
-import 'dart:async';
-import 'dart:math';
+//import 'dart:html';
 
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:learnable/UI/homescreen.dart';
-import 'package:learnable/UI/signinscreen.dart';
-import 'package:firebase_auth/firebase_auth.dart';
-import 'package:firebase_core/firebase_core.dart';
-import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:learnable/UI/verifyemail.dart';
 import 'package:learnable/usermodel/user_model.dart';
-import 'package:font_awesome_flutter/font_awesome_flutter.dart';
-import 'package:google_sign_in/google_sign_in.dart';
 
-class Signup extends StatefulWidget {
-  const Signup({Key? key}) : super(key: key);
+class Instructors extends StatefulWidget {
+  const Instructors({Key? key}) : super(key: key);
 
   @override
-  _SignupState createState() => _SignupState();
+  _InstructorsState createState() => _InstructorsState();
 }
 
-class _SignupState extends State<Signup> {
-  //firebase instance
+class _InstructorsState extends State<Instructors> {
+  //firebase
+  final auth = FirebaseAuth.instance;
 
-  //google sign in
-
-  final GoogleSignIn _googleSignIn = GoogleSignIn(scopes: ["email"]);
-
-  final _Auth = FirebaseAuth.instance;
-
+   bool isinstructor = false;
+  //controller variables
+  final firstnames = TextEditingController();
+  final surname = TextEditingController();
+  final emailcontrollers = TextEditingController();
+  final passwordcontrollers = TextEditingController();
+  final confirmpasswords = TextEditingController();
   final GlobalKey<FormState> _formkey = GlobalKey<FormState>();
-
-  //editing controllers
-
-  final firstnamecontroller = TextEditingController();
-  final lastnamecontroller = TextEditingController();
-  final emailcontroller = TextEditingController();
-  final passwordcontroller = TextEditingController();
-  final confirmpasswordcontroller = TextEditingController();
-
-  late Timer timer;
-
-  @override
-  void initState() {
-    User? user = _Auth.currentUser;
-    user?.sendEmailVerification();
-
-    timer = Timer.periodic(Duration(seconds: (5)), (timer) {});
-    super.initState();
-  }
-
-  @override
-  void dispose() {
-    timer.cancel();
-    super.dispose();
-  }
-
   @override
   Widget build(BuildContext context) {
-    GoogleSignInAccount? user = _googleSignIn.currentUser;
     return Scaffold(
-      appBar: AppBar(
-          elevation: 0.0,
-          backgroundColor: Colors.white,
-          leading: IconButton(
-              onPressed: () {
-                Navigator.pushReplacement(
-                    context, MaterialPageRoute(builder: (_) => SignIn()));
-              },
-              icon: Icon(
-                Icons.arrow_back,
-                color: Colors.lightBlue,
-              ))),
-
-      //body
-      body: Padding(
-        padding: const EdgeInsets.fromLTRB(22, 10, 0, 0),
-        child: Container(
-          width: 350.0,
-          height: 580.0,
-          decoration: BoxDecoration(
-              color: Colors.lightBlue,
-              borderRadius: BorderRadius.circular(37),
-              boxShadow: [
-                BoxShadow(
-                  color: Colors.grey.withOpacity(0.5),
-                  spreadRadius: 3,
-                  blurRadius: 6,
-                  offset: Offset(0, 5), // changes position of shadow
-                ),
-              ]),
-          child: Padding(
-            padding: const EdgeInsets.fromLTRB(35, 50, 30, 30),
-            child: SingleChildScrollView(
+      body: SingleChildScrollView(
+        child: SafeArea(
+          child: Expanded(
+            child: Padding(
+              padding: const EdgeInsets.only(
+                  left: 17.0, right: 17.0, top: 34.0, bottom: 0.0),
               child: Form(
                 key: _formkey,
                 child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
+                  mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          "Welcome!",
-                          style: TextStyle(
-                            color: Colors.white,
-                            fontSize: 25,
-                          ),
-                        ),
-                        SizedBox(
-                          height: 10.0,
-                        ),
-                        Text(
-                          "Sign Up to continue",
-                          style: TextStyle(
-                            color: Colors.white,
-                          ),
-                        )
-                      ],
+                    Text(
+                      "W E L C O M E",
+                      style: TextStyle(
+                        fontSize: 30,
+                        color: Colors.lightBlue,
+                      ),
                     ),
                     SizedBox(
-                      height: 35.0,
+                      height: 10.0,
+                    ),
+                    Text(
+                      "Sign Up as an Instructor",
+                      style: TextStyle(
+                        fontSize: 14,
+                        color: Colors.grey,
+                      ),
+                    ),
+                    SizedBox(
+                      height: 30.0,
                     ),
                     Column(
                       children: [
                         TextFormField(
-                            controller: firstnamecontroller,
+                            controller: firstnames,
                             validator: (value) {
                               if (value!.isEmpty) {
-                                return ("first Name cannot be Empty");
+                                return ("Password is required for login");
                               }
-
-                              return null;
-                            },
-                            onSaved: (value) {
-                              firstnamecontroller.text = value!;
                             },
                             decoration: InputDecoration(
                               contentPadding: EdgeInsets.all(15.0),
                               border: OutlineInputBorder(
-                                borderSide:
-                                    BorderSide(color: Colors.white, width: 1.0),
                                 borderRadius: BorderRadius.circular(10),
                               ),
                               //fillColor: Colors.lightBlue,
@@ -153,22 +84,15 @@ class _SignupState extends State<Signup> {
                           height: 15.0,
                         ),
                         TextFormField(
-                            controller: lastnamecontroller,
+                            controller: surname,
                             validator: (value) {
                               if (value!.isEmpty) {
-                                return ("first Name cannot be Empty");
+                                return ("Password is required for login");
                               }
-
-                              return null;
-                            },
-                            onSaved: (value) {
-                              lastnamecontroller.text = value!;
                             },
                             decoration: InputDecoration(
                               contentPadding: EdgeInsets.all(15.0),
                               border: OutlineInputBorder(
-                                borderSide:
-                                    BorderSide(color: Colors.white, width: 1.0),
                                 borderRadius: BorderRadius.circular(10),
                               ),
                               //fillColor: Colors.lightBlue,
@@ -179,7 +103,7 @@ class _SignupState extends State<Signup> {
                           height: 15.0,
                         ),
                         TextFormField(
-                            controller: emailcontroller,
+                            controller: emailcontrollers,
                             keyboardType: TextInputType.emailAddress,
                             validator: (value) {
                               if (value!.isEmpty) {
@@ -194,14 +118,11 @@ class _SignupState extends State<Signup> {
                               return null;
                             },
                             onSaved: (value) {
-                              emailcontroller.text = value!;
+                              emailcontrollers.text = value!;
                             },
                             decoration: InputDecoration(
                               contentPadding: EdgeInsets.all(15.0),
-                              focusedBorder: InputBorder.none,
                               border: OutlineInputBorder(
-                                borderSide:
-                                    BorderSide(color: Colors.white, width: 1.0),
                                 borderRadius: BorderRadius.circular(10),
                               ),
                               //fillColor: Colors.lightBlue,
@@ -212,7 +133,7 @@ class _SignupState extends State<Signup> {
                           height: 15.0,
                         ),
                         TextFormField(
-                            controller: passwordcontroller,
+                            controller: passwordcontrollers,
                             obscureText: true,
                             validator: (value) {
                               RegExp regex = RegExp(r'^.{6,}$');
@@ -225,28 +146,26 @@ class _SignupState extends State<Signup> {
                               return null;
                             },
                             onSaved: (value) {
-                              passwordcontroller.text = value!;
+                              passwordcontrollers.text = value!;
                             },
                             decoration: InputDecoration(
                               contentPadding: EdgeInsets.all(15.0),
                               border: OutlineInputBorder(
-                                borderSide:
-                                    BorderSide(color: Colors.white, width: 1.0),
                                 borderRadius: BorderRadius.circular(10),
                               ),
                               //fillColor: Colors.lightBlue,
                               //filled: true,
-                              hintText: "password",
+                              hintText: "Password",
                             )),
                         SizedBox(
                           height: 15.0,
                         ),
                         TextFormField(
-                            controller: confirmpasswordcontroller,
+                            controller: confirmpasswords,
                             obscureText: true,
                             validator: (value) {
-                              if (confirmpasswordcontroller.text.length < 6 &&
-                                  passwordcontroller.text != value) {
+                              if (confirmpasswords.text.length < 6 &&
+                                  confirmpasswords.text != value) {
                                 return "password dont match";
                               }
                               return null;
@@ -262,13 +181,14 @@ class _SignupState extends State<Signup> {
                               //filled: true,
                               hintText: "confirm password",
                             )),
-                        SizedBox(
-                          height: 15,
-                        ),
+                        SizedBox(height: 20.0),
                         MaterialButton(
                           onPressed: () async {
-                            signup(
-                                emailcontroller.text, passwordcontroller.text);
+                            signup(emailcontrollers.text,
+                                passwordcontrollers.text);
+                            setState(() {
+                              isinstructor = true;
+                            });
                           },
                           color: Colors.white,
                           child: Text(
@@ -281,7 +201,7 @@ class _SignupState extends State<Signup> {
                               borderRadius: BorderRadius.circular(22.0)),
                         ),
                       ],
-                    ),
+                    )
                   ],
                 ),
               ),
@@ -292,15 +212,14 @@ class _SignupState extends State<Signup> {
     );
   }
 
-  void signup(String email, String Password) async {
-    try {
-      if (_formkey.currentState!.validate()) {
-        await _Auth.createUserWithEmailAndPassword(
-                email: email, password: Password)
-            .then((value) => {postDetailsToFirestore()});
-      }
-    } on FirebaseAuthException catch (error) {
-      Fluttertoast.showToast(msg: "${error.message}");
+  void signup(String email, String password) async {
+    if (_formkey.currentState!.validate()) {
+      await auth
+          .createUserWithEmailAndPassword(email: email, password: password)
+          .then((value) => {postDetailsToFirestore()})
+          .catchError((e) {
+        Fluttertoast.showToast(msg: e!.message);
+      });
     }
   }
 
@@ -310,28 +229,25 @@ class _SignupState extends State<Signup> {
     //sending values
 
     FirebaseFirestore firebaseFirestore = FirebaseFirestore.instance;
-    User? user = _Auth.currentUser;
+    User? user = auth.currentUser;
 
     UserModel userModel = UserModel();
 
     //writing values to firestore
-   
-      userModel.email = user!.email;
-      userModel.uid = user.uid;
-      userModel.firstname = firstnamecontroller.text;
-      userModel.lastname = lastnamecontroller.text;
 
-      await firebaseFirestore
-          .collection("Users")
-          .doc(user.uid)
-          .set(userModel.toMap());
-      Fluttertoast.showToast(msg: "Account created successfully");
+    userModel.email = user!.email;
+    userModel.uid = user.uid;
+    userModel.firstname = firstnames.text;
+    userModel.lastname = surname.text;
+    userModel.isinstructor = isinstructor;
 
-      Navigator.of(context).pushReplacement(
-          MaterialPageRoute(builder: (context) => Verify()));
-    
+    await firebaseFirestore
+        .collection("Users")
+        .doc(user.uid)
+        .set(userModel.toMap());
+    Fluttertoast.showToast(msg: "Account created successfully");
+
+    Navigator.of(context)
+        .pushReplacement(MaterialPageRoute(builder: (context) => Homescreen()));
   }
-
-  //Emailing function
-
 }

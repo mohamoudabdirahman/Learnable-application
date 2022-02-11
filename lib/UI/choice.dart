@@ -3,6 +3,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter/services.dart';
+import 'package:learnable/UI/instructor.dart';
 import 'package:learnable/UI/signinscreen.dart';
 import 'package:learnable/UI/signupscreen.dart';
 
@@ -47,7 +48,10 @@ class _ChoicescreenState extends State<Choicescreen> {
               height: 20.0,
             ),
             MaterialButton(
-              onPressed: () {},
+              onPressed: () {
+                Navigator.pushReplacement(context,
+                    MaterialPageRoute(builder: (context) => Instructors()));
+              },
               color: Colors.white,
               minWidth: 262.0,
               shape: RoundedRectangleBorder(
