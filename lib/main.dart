@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:learnable/UI/choice.dart';
+import 'package:learnable/UI/setup.dart';
 import 'package:learnable/UI/signinscreen.dart';
 import 'package:learnable/UI/verifyemail.dart';
 

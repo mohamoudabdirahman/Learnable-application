@@ -13,7 +13,6 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:learnable/UI/verifyemail.dart';
 import 'package:learnable/usermodel/user_model.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
-import 'package:google_sign_in/google_sign_in.dart';
 
 class Signup extends StatefulWidget {
   const Signup({Key? key}) : super(key: key);
@@ -27,7 +26,7 @@ class _SignupState extends State<Signup> {
 
   //google sign in
 
-  final GoogleSignIn _googleSignIn = GoogleSignIn(scopes: ["email"]);
+
 
   final _Auth = FirebaseAuth.instance;
 
@@ -60,7 +59,6 @@ class _SignupState extends State<Signup> {
 
   @override
   Widget build(BuildContext context) {
-    GoogleSignInAccount? user = _googleSignIn.currentUser;
     return Scaffold(
       appBar: AppBar(
           elevation: 0.0,

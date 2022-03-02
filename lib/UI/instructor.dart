@@ -7,6 +7,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:learnable/UI/homescreen.dart';
+import 'package:learnable/UI/verifyemail.dart';
 import 'package:learnable/usermodel/user_model.dart';
 
 class Instructors extends StatefulWidget {
@@ -248,6 +249,6 @@ class _InstructorsState extends State<Instructors> {
     Fluttertoast.showToast(msg: "Account created successfully");
 
     Navigator.of(context)
-        .pushReplacement(MaterialPageRoute(builder: (context) => Homescreen()));
+        .pushReplacement(MaterialPageRoute(builder: (context) => Verify()));
   }
 }

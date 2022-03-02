@@ -6,6 +6,7 @@ import 'dart:ui';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
+import 'package:learnable/UI/Instructordashboard.dart';
 import 'package:learnable/UI/choice.dart';
 import 'package:learnable/UI/homescreen.dart';
 import 'package:learnable/UI/signupscreen.dart';
@@ -13,6 +14,7 @@ import 'package:firebase_auth/firebase_auth.dart' as auth;
 import 'package:firebase_core/firebase_core.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:learnable/usermodel/user_model.dart';
+import 'package:loading_indicator/loading_indicator.dart';
 import 'instructor.dart';
 
 class SignIn extends StatefulWidget {
@@ -22,7 +24,9 @@ class SignIn extends StatefulWidget {
 }
 
 class _signupState extends State<SignIn> {
-  // google signin
+  //collection
+  final Stream<QuerySnapshot> userref =
+      FirebaseFirestore.instance.collection("users").snapshots();
 
   //controllers of Sign in fields
   final TextEditingController emailcontroller = TextEditingController();
@@ -34,6 +38,20 @@ class _signupState extends State<SignIn> {
   final authentications = FirebaseFirestore.instance;
 
   final user = auth.FirebaseAuth.instance.currentUser;
+  bool ispressed = false;
+
+  final CollectionReference userdata =
+      FirebaseFirestore.instance.collection("Users");
+
+  void buttonpressed() {
+    setState(() {
+      if (ispressed == false) {
+        ispressed == true;
+      } else if (ispressed == true) {
+        ispressed == false;
+      }
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -110,7 +128,7 @@ class _signupState extends State<SignIn> {
                         ),
                         TextFormField(
                             controller: passwordcontroller,
-                            obscureText: true,
+                            obscureText: ispressed,
                             validator: (value) {
                               RegExp regex = RegExp(r'^.{6,}$');
                               if (value!.isEmpty) {
@@ -125,6 +143,20 @@ class _signupState extends State<SignIn> {
                               passwordcontroller.text = value!;
                             },
                             decoration: InputDecoration(
+                              suffixIcon: IconButton(
+                                onPressed: () {
+                                  setState(() {
+                                    ispressed=!ispressed;
+                                  });
+                                  // buttonpressed();
+                                  
+                                },
+                                icon: Icon(ispressed
+                                  ?Icons.visibility:
+                                  Icons.visibility_off,
+                                  size: 20.0,
+                                ),
+                              ),
                               contentPadding: EdgeInsets.all(15.0),
                               border: OutlineInputBorder(
                                 borderRadius: BorderRadius.circular(10),
@@ -189,11 +221,14 @@ class _signupState extends State<SignIn> {
             ))));
   }
 
-  void signin(String email, String password) async {
+  signin(String email, String password) async {
     try {
       if (_formkey.currentState!.validate()) {
         await _Auth.signInWithEmailAndPassword(
             email: email, password: password);
+        Navigator.of(context).pushReplacement(
+            MaterialPageRoute(builder: (context) => InstructorDash()));
+
         Fluttertoast.showToast(msg: "you are seccusfully Signed In");
         Navigator.of(context).pushReplacement(
             MaterialPageRoute(builder: (context) => Homescreen()));

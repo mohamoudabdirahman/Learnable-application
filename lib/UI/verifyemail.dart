@@ -5,6 +5,7 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+import 'package:learnable/UI/setup.dart';
 
 import 'homescreen.dart';
 
@@ -87,7 +88,7 @@ class _VerifyState extends State<Verify> {
     if (user.emailVerified) {
       timer.cancel();
       Navigator.pushReplacement(
-          context, MaterialPageRoute(builder: (context) => const Homescreen()));
+          context, MaterialPageRoute(builder: (context) => const SetupOne()));
     }
   }
 }
