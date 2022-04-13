@@ -37,3 +37,60 @@ class UserModel {
     };
   }
 }
+
+class CourseModel {
+  String? coursetitle;
+  String? courterating;
+  String? price;
+  String? desc;
+  String? thumbnail;
+  String? docid = FirebaseFirestore.instance.collection("Course").doc().id;
+  final auth = FirebaseAuth.instance.currentUser;
+  
+  FirebaseFirestore firebaseFirestore = FirebaseFirestore.instance;
+
+  CourseModel(
+      {this.coursetitle,
+      this.docid,
+      this.courterating,
+      this.price,
+      this.desc,
+      this.thumbnail});
+
+  factory CourseModel.fromMap(map) {
+    return CourseModel(
+        coursetitle: map['Coursetitle'],
+        docid: map["docid"],
+        courterating: map['Courserating'],
+        price: map['price'],
+        desc: map['desc'],
+        thumbnail: map['thumbnail']);
+  }
+
+  Map<String, dynamic> toMap() {
+    return {
+      'Coursetitle': coursetitle,
+      'Courserating': courterating,
+       "docid" :docid,
+      'price': price,
+      'desc': desc,
+      'thumbnail': thumbnail
+    };
+  }
+}
+
+class ChapterModel {
+  String? chaptertitle;
+  String? videolesson;
+
+  ChapterModel({this.chaptertitle, this.videolesson});
+
+  factory ChapterModel.fromMap(map) {
+    return ChapterModel(
+        chaptertitle: map['chaptitle'], videolesson: map['vidurl']);
+  }
+
+  Map<String, dynamic> toMap() {
+    return {'chaptitle': chaptertitle, 'vidurl': videolesson};
+  }
+}

@@ -4,21 +4,26 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:learnable/UI/Instructordashboard.dart';
+import 'package:learnable/UI/homescreen.dart';
 import 'package:learnable/UI/mylearning.dart';
 import 'package:learnable/UI/pages/mainpage.dart';
 import 'package:learnable/UI/util/accountrows.dart';
 import 'package:learnable/usermodel/user_model.dart';
+import 'package:loading_indicator/loading_indicator.dart';
 
 class Accountpage extends StatefulWidget {
-  const Accountpage({Key? key}) : super(key: key);
+  Color backcolor = Color(0x00ffffff);
 
   @override
   _AccountpageState createState() => _AccountpageState();
 }
 
 class _AccountpageState extends State<Accountpage> {
+  bool ispressed = false;
   final auth = FirebaseAuth.instance;
   UserModel loggedInUser = UserModel();
+  User? user = FirebaseAuth.instance.currentUser;
 
   @override
   void initState() {
@@ -34,6 +39,19 @@ class _AccountpageState extends State<Accountpage> {
     });
   }
 
+  void checkingswitch() {
+    if (ispressed == false) {
+      setState(() {
+        ispressed == true;
+      });
+    }
+    if (ispressed == true) {
+      setState(() {
+        ispressed == false;
+      });
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return SafeArea(
@@ -44,22 +62,41 @@ class _AccountpageState extends State<Accountpage> {
               crossAxisAlignment: CrossAxisAlignment.center,
               children: [
                 Container(
-                  decoration: BoxDecoration(
-                    shape: BoxShape.circle,
-                    boxShadow: [
-                      BoxShadow(
-                          blurRadius: 5,
-                          color: Colors.black.withOpacity(0.3),
-                          spreadRadius: 0,
-                          offset: Offset(0, 5))
-                    ],
-                  ),
-                  child: CircleAvatar(
-                    radius: 40.0,
-                    backgroundImage: NetworkImage(
-                        "https://images.unsplash.com/photo-1522228115018-d838bcce5c3a?ixlib=rb-1.2.1&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=687&q=80"),
-                  ),
-                ),
+                    width: 80.0,
+                    height: 80.0,
+                    decoration: BoxDecoration(
+                      shape: BoxShape.circle,
+                    ),
+                    
+                      child: CircleAvatar(
+                        child: StreamBuilder(
+                            stream: FirebaseFirestore.instance
+                                .collection("Users")
+                                .doc(user!.uid)
+                                .collection("images")
+                                .snapshots(),
+                            builder: (BuildContext context,
+                                AsyncSnapshot<QuerySnapshot> snapshot) {
+                              if (snapshot.connectionState ==
+                                  ConnectionState.waiting) {
+                                return LoadingIndicator(
+                                  indicatorType: Indicator.circleStrokeSpin,
+                                  colors: [Colors.white],
+                                  strokeWidth: 1,
+                                );
+                              } else {
+                                String url =
+                                    snapshot.data!.docs[0]['downloadUrl'];
+                                
+                                return CircleAvatar(
+                                  backgroundImage: NetworkImage(url),
+                                  radius: 80,
+                                );
+                                
+                              }
+                            }),
+                      ),
+                    ),
                 SizedBox(
                   height: 10.0,
                 ),
@@ -85,9 +122,27 @@ class _AccountpageState extends State<Accountpage> {
                           width: 10.0,
                         ),
                         Switch.adaptive(
-                            value: true,
-                            onChanged: (bool state) {
-                              print(state);
+                            value: ispressed,
+                            onChanged: (value) {
+                              setState(() {
+                                ispressed = value;
+                                if (ispressed == true) {
+                                  Navigator.pushReplacement(
+                                      context,
+                                      MaterialPageRoute(
+                                          builder: ((context) =>
+                                              Homescreen())));
+                                }
+                                if (ispressed == false) {
+                                  ispressed = false;
+                                  Navigator.pushReplacement(
+                                      context,
+                                      MaterialPageRoute(
+                                          builder: ((context) =>
+                                              InstructorDash())));
+                                }
+                                print(ispressed);
+                              });
                             })
                       ],
                     ),
@@ -96,36 +151,44 @@ class _AccountpageState extends State<Accountpage> {
                 SizedBox(
                   height: 10.0,
                 ),
-                Container(
-                  height: 454.9,
-                  decoration: BoxDecoration(
-                    borderRadius: BorderRadius.only(
-                        topLeft: Radius.circular(52),
-                        topRight: Radius.circular(52)),
-                    color: Colors.lightBlue,
-                  ),
-                  child: Padding(
-                    padding: const EdgeInsets.only(
-                        left: 52.0, top: 62.0, right: 53.0),
-                    child: Column(
-                      children: [
-                        ProfileRows(
-                          iconimage: 'lib/images/Group 1.png',
-                          title: 'My Learning',
-                        ),
-                        ProfileRows(
-                          iconimage: 'lib/images/favourites.png',
-                          title: 'Wishlist',
-                        ),
-                        ProfileRows(
-                          iconimage: 'lib/images/settings.png',
-                          title: 'Account Settings',
-                        ),
-                        ProfileRows(
-                          iconimage: 'lib/images/logout.png',
-                          title: 'Logout',
-                        ),
-                      ],
+                Expanded(
+                  child: Container(
+                    height: 454.9,
+                    decoration: BoxDecoration(
+                        boxShadow: <BoxShadow>[
+                          BoxShadow(
+                            color: Colors.grey.shade800.withOpacity(0.5),
+                            offset: Offset(3, 3),
+                            blurRadius: 8,
+                          )
+                        ],
+                        borderRadius: BorderRadius.only(
+                            topLeft: Radius.circular(52),
+                            topRight: Radius.circular(52)),
+                        color: Colors.white),
+                    child: Padding(
+                      padding: const EdgeInsets.only(
+                          left: 52.0, top: 62.0, right: 53.0),
+                      child: Column(
+                        children: [
+                          ProfileRows(
+                            iconimage: 'lib/images/Group 1.png',
+                            title: 'My Learning',
+                          ),
+                          ProfileRows(
+                            iconimage: 'lib/images/favourites.png',
+                            title: 'Wishlist',
+                          ),
+                          ProfileRows(
+                            iconimage: 'lib/images/settings.png',
+                            title: 'Account Settings',
+                          ),
+                          ProfileRows(
+                            iconimage: 'lib/images/logout.png',
+                            title: 'Logout',
+                          ),
+                        ],
+                      ),
                     ),
                   ),
                 )

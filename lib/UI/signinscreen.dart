@@ -1,9 +1,11 @@
 // ignore_for_file: prefer_const_constructors, prefer_const_literals_to_create_immutables
 
+import 'dart:async';
 import 'dart:math';
 import 'dart:ui';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:learnable/UI/Instructordashboard.dart';
@@ -36,22 +38,13 @@ class _signupState extends State<SignIn> {
 
   final auth.FirebaseAuth _Auth = auth.FirebaseAuth.instance;
   final authentications = FirebaseFirestore.instance;
+  FirebaseAuth users = FirebaseAuth.instance;
+  UserModel loggedInuser = UserModel();
 
-  final user = auth.FirebaseAuth.instance.currentUser;
-  bool ispressed = false;
+  final user = auth.FirebaseAuth.instance;
+  bool ispressed = true;
 
-  final CollectionReference userdata =
-      FirebaseFirestore.instance.collection("Users");
 
-  void buttonpressed() {
-    setState(() {
-      if (ispressed == false) {
-        ispressed == true;
-      } else if (ispressed == true) {
-        ispressed == false;
-      }
-    });
-  }
 
   @override
   Widget build(BuildContext context) {
@@ -146,14 +139,14 @@ class _signupState extends State<SignIn> {
                               suffixIcon: IconButton(
                                 onPressed: () {
                                   setState(() {
-                                    ispressed=!ispressed;
+                                    ispressed = !ispressed;
                                   });
                                   // buttonpressed();
-                                  
                                 },
-                                icon: Icon(ispressed
-                                  ?Icons.visibility:
-                                  Icons.visibility_off,
+                                icon: Icon(
+                                  ispressed
+                                      ? Icons.visibility
+                                      : Icons.visibility_off,
                                   size: 20.0,
                                 ),
                               ),
@@ -221,17 +214,30 @@ class _signupState extends State<SignIn> {
             ))));
   }
 
-  signin(String email, String password) async {
+  void signin(String email, String password) async {
+    UserModel userModel = UserModel();
     try {
       if (_formkey.currentState!.validate()) {
         await _Auth.signInWithEmailAndPassword(
             email: email, password: password);
-        Navigator.of(context).pushReplacement(
-            MaterialPageRoute(builder: (context) => InstructorDash()));
 
-        Fluttertoast.showToast(msg: "you are seccusfully Signed In");
-        Navigator.of(context).pushReplacement(
-            MaterialPageRoute(builder: (context) => Homescreen()));
+        await FirebaseFirestore.instance
+            .collection('Users')
+            .doc(user.currentUser!.uid)
+            .get()
+            .then((value) {
+            userModel =  UserModel.fromMap(value.data());
+
+            setState(() {
+              if(userModel.isinstructor == true){
+                Navigator.pushReplacement(context, MaterialPageRoute(builder: (context)=> InstructorDash()));
+              }else if(userModel.isinstructor == null){
+                Navigator.pushReplacement(context, MaterialPageRoute(builder: (context)=> Homescreen()));
+              }
+              Fluttertoast.showToast(msg: "you are seccusfully Signed In");
+            });
+            });
+        
       }
     } on auth.FirebaseAuthException catch (error) {
       Fluttertoast.showToast(msg: "${error.message}");

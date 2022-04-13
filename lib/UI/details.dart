@@ -12,7 +12,9 @@ import 'package:flutter/services.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:learnable/UI/Instructordashboard.dart';
 import 'package:learnable/UI/homescreen.dart';
+import 'package:learnable/usermodel/user_model.dart';
 import 'package:lottie/lottie.dart';
 
 class Profilepic extends StatefulWidget {
@@ -26,6 +28,8 @@ class _ProfilepicState extends State<Profilepic> {
   File? _image;
   String? downloadUrl;
   User? user = FirebaseAuth.instance.currentUser;
+
+  UserModel loggedinUser = UserModel();
 
   Future ImagePickerMethod() async {
     final pick = await ImagePicker().pickImage(source: ImageSource.gallery);
@@ -42,10 +46,9 @@ class _ProfilepicState extends State<Profilepic> {
   Future uploadimages() async {
     FirebaseFirestore.instance;
     Reference ref =
-        await FirebaseStorage.instance.ref().child("${user!.uid}/images");
+        FirebaseStorage.instance.ref().child("${user!.uid}/images");
     await ref.putFile(_image!);
     downloadUrl = await ref.getDownloadURL();
-    print(downloadUrl);
 
     await FirebaseFirestore.instance
         .collection("Users")
@@ -129,13 +132,11 @@ class _ProfilepicState extends State<Profilepic> {
                   MaterialButton(
                     onPressed: () {
                       if (_image != null) {
-                        uploadimages().whenComplete(() => showSnackBar(
-                            "Succesfully uploaded your image",
-                            Duration(milliseconds: 300)));
-                        Navigator.pushReplacement(
-                            context,
-                            MaterialPageRoute(
-                                builder: (context) => Homescreen()));
+                        uploadimages()
+                            .whenComplete(() => showSnackBar(
+                                "Succesfully uploaded your image",
+                                Duration(milliseconds: 300)))
+                            .whenComplete((() => decideview()));
                       } else {
                         showSnackBar("No images is selected",
                             Duration(microseconds: 1000));
@@ -165,5 +166,23 @@ class _ProfilepicState extends State<Profilepic> {
         duration: d,
         backgroundColor: Colors.lightBlue);
     ScaffoldMessenger.of(context).showSnackBar(snackBar);
+  }
+
+  decideview() async {
+    await FirebaseFirestore.instance
+        .collection("Users")
+        .doc(user!.uid)
+        .get()
+        .then((value) {
+      loggedinUser = UserModel.fromMap(value.data());
+
+      if (loggedinUser.isinstructor == null) {
+        Navigator.pushReplacement(
+            context, MaterialPageRoute(builder: (context) => Homescreen()));
+      } else if (loggedinUser.isinstructor == true) {
+        Navigator.pushReplacement(
+            context, MaterialPageRoute(builder: (context) => InstructorDash()));
+      }
+    });
   }
 }

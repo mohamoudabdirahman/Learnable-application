@@ -33,6 +33,36 @@
   <!-- This script installs service_worker.js to provide PWA functionality to
        application. For more information, see:
        https://developers.google.com/web/fundamentals/primers/service-workers -->
+
+       <script type="module">
+        // Import the functions you need from the SDKs you need
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/9.6.10/firebase-app.js";
+        import { getAnalytics } from "https://www.gstatic.com/firebasejs/9.6.10/firebase-analytics.js";
+        // TODO: Add SDKs for Firebase products that you want to use
+        // https://firebase.google.com/docs/web/setup#available-libraries
+      
+        // Your web app's Firebase configuration
+        // For Firebase JS SDK v7.20.0 and later, measurementId is optional
+        const firebaseConfig = {
+          apiKey: "AIzaSyDv9VTSGUl6hIuv65dLL1TNQmCd1mnn1tc",
+          authDomain: "learnable-d5272.firebaseapp.com",
+          projectId: "learnable-d5272",
+          storageBucket: "learnable-d5272.appspot.com",
+          messagingSenderId: "467155727487",
+          appId: "1:467155727487:web:b4334d2c100fbe151b3b4a",
+          measurementId: "G-G9EK7E6S60"
+        };
+      
+        // Initialize Firebase
+        const app = initializeApp(firebaseConfig);
+        const analytics = getAnalytics(app);
+      </script>
+
+      <script>src="https://www.gstatic.com/firebasejs/10.2.9/firebase-app.js"</script>
+      <script>src="https://www.gstatic.com/firebasejs/10.2.9/firebase-storage.js"</script>
+      <script>src="https://www.gstatic.com/firebasejs/10.2.9/firebase-firestore.js"</script>
+      <script>src="https://www.gstatic.com/firebasejs/10.2.9/firebase-auth.js"</script>
+      <script>src="https://www.gstatic.com/firebasejs/10.2.9/firebase-core.js"</script>
   <script>
     var serviceWorkerVersion = null;
     var scriptLoaded = false;

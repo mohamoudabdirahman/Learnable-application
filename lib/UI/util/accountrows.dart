@@ -25,7 +25,7 @@ class ProfileRows extends StatelessWidget {
               width: 51.0,
               height: 42.0,
               decoration: BoxDecoration(
-                color: Colors.lightBlue,
+                color: Colors.white,
                 borderRadius: BorderRadius.circular(4.0),
                 boxShadow: <BoxShadow>[
                   BoxShadow(
@@ -41,13 +41,15 @@ class ProfileRows extends StatelessWidget {
                 ],
               ),
               // ignore: prefer_const_constructors
-              child: Image(image: AssetImage(iconimage!)),
+              child: Image(
+                color: Colors.lightBlue,
+                image: AssetImage(iconimage!)),
             ),
             SizedBox(
               width: 10.0,
             ),
             Text(title!,
-                style: GoogleFonts.roboto(fontSize: 18.0, color: Colors.white))
+                style: GoogleFonts.roboto(fontSize: 18.0, color: Colors.lightBlue))
           ],
         ),
       ),
