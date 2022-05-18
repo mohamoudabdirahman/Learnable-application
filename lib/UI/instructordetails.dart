@@ -17,20 +17,21 @@ import 'package:learnable/UI/homescreen.dart';
 import 'package:learnable/usermodel/user_model.dart';
 import 'package:lottie/lottie.dart';
 
-class Profilepic extends StatefulWidget {
-  const Profilepic({Key? key}) : super(key: key);
+class InstructorProfilepic extends StatefulWidget {
+  const InstructorProfilepic({Key? key}) : super(key: key);
 
   @override
   _ProfilepicState createState() => _ProfilepicState();
 }
 
-class _ProfilepicState extends State<Profilepic> {
+class _ProfilepicState extends State<InstructorProfilepic> {
   File? _image;
   String? downloadUrl;
   User? user = FirebaseAuth.instance.currentUser;
 
   InstructorModel loggedInInstructor = InstructorModel();
   UserModel loggedinUser = UserModel();
+  InstructorImageUpload instrucimage = InstructorImageUpload();
 
   Future ImagePickerMethod() async {
     final pick = await ImagePicker().pickImage(source: ImageSource.gallery);
@@ -46,15 +47,18 @@ class _ProfilepicState extends State<Profilepic> {
 
   Future uploadimages() async {
     FirebaseFirestore.instance;
-    Reference ref = FirebaseStorage.instance.ref().child(user!.uid).child('profile picture').child('profilepic');
+    Reference ref = FirebaseStorage.instance.ref().child("${user!.uid}/images");
     await ref.putFile(_image!);
     downloadUrl = await ref.getDownloadURL();
 
+    instrucimage.downlaodurl = downloadUrl;
+
     await FirebaseFirestore.instance
-        .collection("Users")
-        .doc(user!.uid)
-        .collection("images")
-        .add({'downloadUrl': downloadUrl});
+            .collection("Instructors")
+            .doc(user!.uid)
+            .collection("Images")
+            .add({'downloadUrl': downloadUrl});
+     Navigator.pushReplacement(context, MaterialPageRoute(builder: ((context) => InstructorDash())));
   }
 
   @override
@@ -139,13 +143,14 @@ class _ProfilepicState extends State<Profilepic> {
                   MaterialButton(
                     onPressed: () {
                       if (_image != null) {
-                        uploadimages().whenComplete(() => decider()).whenComplete(() => showSnackBar(
+                        uploadimages().whenComplete(() => showSnackBar(
                             "Succesfully uploaded your image",
                             Duration(milliseconds: 300)));
                       } else {
                         showSnackBar("No images is selected",
                             Duration(microseconds: 1000));
-                    }},
+                      }
+                    },
                     color: Colors.lightBlue,
                     child: Text(
                       "Finish",
@@ -172,19 +177,5 @@ class _ProfilepicState extends State<Profilepic> {
     ScaffoldMessenger.of(context).showSnackBar(snackBar);
   }
 
-  decider() async {
-    await FirebaseFirestore.instance
-        .collection('Users')
-        .doc(user!.uid)
-        .get()
-        .then((value) => loggedinUser = UserModel.fromMap(value.data()));
-    
-    if(loggedinUser.isinstructor == null){
-      Navigator.pushReplacement(
-        context, MaterialPageRoute(builder: ((context) => Homescreen())));
-    }else if(loggedinUser.isinstructor == true ){
-      Navigator.pushReplacement(
-        context, MaterialPageRoute(builder: ((context) => InstructorDash())));
-    }
-  }
+
 }

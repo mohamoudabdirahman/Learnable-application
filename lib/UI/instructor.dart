@@ -9,6 +9,7 @@ import 'package:fluttertoast/fluttertoast.dart';
 import 'package:learnable/UI/homescreen.dart';
 import 'package:learnable/UI/verifyemail.dart';
 import 'package:learnable/usermodel/user_model.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class Instructors extends StatefulWidget {
   const Instructors({Key? key}) : super(key: key);
@@ -21,7 +22,7 @@ class _InstructorsState extends State<Instructors> {
   //firebase
   final auth = FirebaseAuth.instance;
 
-   bool isinstructor = false;
+  bool isinstructor = false;
   //controller variables
   final firstnames = TextEditingController();
   final surname = TextEditingController();
@@ -29,6 +30,8 @@ class _InstructorsState extends State<Instructors> {
   final passwordcontrollers = TextEditingController();
   final confirmpasswords = TextEditingController();
   final GlobalKey<FormState> _formkey = GlobalKey<FormState>();
+
+  bool? finalbool;
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -224,7 +227,7 @@ class _InstructorsState extends State<Instructors> {
     }
   }
 
-  postDetailsToFirestore() async {
+  Future postDetailsToFirestore() async {
     //calling firestore
     //calling usermodel
     //sending values
@@ -232,20 +235,22 @@ class _InstructorsState extends State<Instructors> {
     FirebaseFirestore firebaseFirestore = FirebaseFirestore.instance;
     User? user = auth.currentUser;
 
-    UserModel userModel = UserModel();
+    UserModel usermodel = UserModel();
+
+    
 
     //writing values to firestore
 
-    userModel.email = user!.email;
-    userModel.uid = user.uid;
-    userModel.firstname = firstnames.text;
-    userModel.lastname = surname.text;
-    userModel.isinstructor = isinstructor;
+    usermodel.email = user!.email;
+    usermodel.uid = user.uid;
+    usermodel.firstname = firstnames.text;
+    usermodel.lastname = surname.text;
+    usermodel.isinstructor = isinstructor;
 
     await firebaseFirestore
         .collection("Users")
         .doc(user.uid)
-        .set(userModel.toMap());
+        .set(usermodel.toMap());
     Fluttertoast.showToast(msg: "Account created successfully");
 
     Navigator.of(context)

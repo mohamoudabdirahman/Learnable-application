@@ -6,6 +6,7 @@ import 'package:firebase_core/firebase_core.dart';
 import 'package:learnable/UI/choice.dart';
 import 'package:learnable/UI/setup.dart';
 import 'package:learnable/UI/signinscreen.dart';
+import 'package:learnable/UI/util/splashscreen.dart';
 import 'package:learnable/UI/verifyemail.dart';
 import 'dart:io' show Platform;
 
@@ -33,7 +34,7 @@ class MyApp extends StatelessWidget {
       theme: ThemeData(
         primarySwatch: Colors.blue,
       ),
-      home: const Choicescreen(),
+      home: const SplashScreen(),
     );
   }
 }

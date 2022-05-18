@@ -8,9 +8,11 @@ import 'package:learnable/UI/Instructordashboard.dart';
 import 'package:learnable/UI/homescreen.dart';
 import 'package:learnable/UI/mylearning.dart';
 import 'package:learnable/UI/pages/mainpage.dart';
+import 'package:learnable/UI/signinscreen.dart';
 import 'package:learnable/UI/util/accountrows.dart';
 import 'package:learnable/usermodel/user_model.dart';
 import 'package:loading_indicator/loading_indicator.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class Accountpage extends StatefulWidget {
   Color backcolor = Color(0x00ffffff);
@@ -62,48 +64,42 @@ class _AccountpageState extends State<Accountpage> {
               crossAxisAlignment: CrossAxisAlignment.center,
               children: [
                 Container(
-                    width: 80.0,
-                    height: 80.0,
-                    decoration: BoxDecoration(
-                      shape: BoxShape.circle,
-                    ),
-                    
-                      child: CircleAvatar(
-                        child: StreamBuilder(
-                            stream: FirebaseFirestore.instance
-                                .collection("Users")
-                                .doc(user!.uid)
-                                .collection("images")
-                                .snapshots(),
-                            builder: (BuildContext context,
-                                AsyncSnapshot<QuerySnapshot> snapshot) {
-                              if (snapshot.connectionState ==
-                                  ConnectionState.waiting) {
-                                return LoadingIndicator(
-                                  indicatorType: Indicator.circleStrokeSpin,
-                                  colors: [Colors.white],
-                                  strokeWidth: 1,
-                                );
-                              } else {
-                                String url =
-                                    snapshot.data!.docs[0]['downloadUrl'];
-                                
-                                return CircleAvatar(
-                                  backgroundImage: NetworkImage(url),
-                                  radius: 80,
-                                );
-                                
-                              }
-                            }),
-                      ),
-                    ),
+                  width: 80.0,
+                  height: 80.0,
+                  decoration: BoxDecoration(
+                    shape: BoxShape.circle,
+                  ),
+                  child: CircleAvatar(
+                      child: StreamBuilder(
+                    stream: FirebaseFirestore.instance
+                        .collection('Users')
+                        .doc(user!.uid)
+                        .collection('images')
+                        .snapshots(),
+                    builder: (BuildContext context,
+                        AsyncSnapshot<QuerySnapshot> snapshot) {
+                      if (snapshot.connectionState == ConnectionState.waiting) {
+                        return CircularProgressIndicator();
+                      }
+                      if (snapshot.hasError) {
+                        return Icon(Icons.error);
+                      }
+                      if (snapshot.hasData) {
+                        String imageurl = snapshot.data!.docs[0]['downloadUrl'];
+                        return CircleAvatar(
+                          backgroundImage: NetworkImage(imageurl),
+                          radius: 80,
+                        );
+                      }
+                      return CircularProgressIndicator();
+                    },
+                  )),
+                ),
                 SizedBox(
                   height: 10.0,
                 ),
-                Text(
-                  "${loggedInUser.firstname} ${loggedInUser.lastname}",
-                  style: TextStyle(color: Colors.lightBlue, fontSize: 17.0),
-                ),
+                Text("${loggedInUser.firstname} ${loggedInUser.lastname}",
+                    style: TextStyle(fontSize: 16, color: Colors.lightBlue)),
                 Padding(
                   padding: const EdgeInsets.all(10.0),
                   child: Container(
@@ -183,9 +179,20 @@ class _AccountpageState extends State<Accountpage> {
                             iconimage: 'lib/images/settings.png',
                             title: 'Account Settings',
                           ),
-                          ProfileRows(
-                            iconimage: 'lib/images/logout.png',
-                            title: 'Logout',
+                          GestureDetector(
+                            onTap: () async {
+                              SharedPreferences sharedPreferences =
+                                  await SharedPreferences.getInstance();
+                              sharedPreferences.remove('email');
+                              Navigator.pushReplacement(
+                                  context,
+                                  MaterialPageRoute(
+                                      builder: (context) => SignIn()));
+                            },
+                            child: ProfileRows(
+                              iconimage: 'lib/images/logout.png',
+                              title: 'Logout',
+                            ),
                           ),
                         ],
                       ),

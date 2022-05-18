@@ -2,8 +2,11 @@
 
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:learnable/UI/Instructordashboard.dart';
 import 'package:learnable/UI/details.dart';
+import 'package:learnable/UI/instructordetails.dart';
 import 'package:lottie/lottie.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class SetupOne extends StatefulWidget {
   const SetupOne({Key? key}) : super(key: key);
@@ -13,6 +16,8 @@ class SetupOne extends StatefulWidget {
 }
 
 class _SetupOneState extends State<SetupOne> {
+  bool? boolvalue;
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -68,7 +73,7 @@ any time your wish with Learnable''',
                   mainAxisAlignment: MainAxisAlignment.end,
                   children: [
                     MaterialButton(
-                      onPressed: () {
+                      onPressed: () async {
                         Navigator.pushReplacement(
                             context,
                             MaterialPageRoute(

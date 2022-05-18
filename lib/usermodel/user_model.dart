@@ -38,6 +38,57 @@ class UserModel {
   }
 }
 
+class InstructorModel {
+  String? uid;
+  String? firstname;
+  String? lastname;
+  String? email;
+  bool? isinstructor = false;
+  final auth = FirebaseAuth.instance.currentUser;
+  FirebaseFirestore firebaseFirestore = FirebaseFirestore.instance;
+
+  InstructorModel(
+      {this.uid, this.firstname, this.lastname, this.email, this.isinstructor});
+
+  //recieving data from the server
+
+  // ignore: avoid_types_as_parameter_names
+  factory InstructorModel.fromMap(map) {
+    return InstructorModel(
+        uid: map[FirebaseAuth.instance.currentUser!.uid],
+        firstname: map['First Name'],
+        lastname: map['Last Name'],
+        email: map['Email'],
+        isinstructor: map['Isinstructor']);
+  }
+
+  //sending data to the server
+
+  Map<String, dynamic> toMap() {
+    return {
+      'uid': FirebaseAuth.instance.currentUser!.uid,
+      'First Name': firstname,
+      'Last Name': lastname,
+      'Email': email,
+      'Isinstructor': isinstructor
+    };
+  }
+}
+
+class InstructorImageUpload {
+  String? downlaodurl;
+
+  InstructorImageUpload({this.downlaodurl});
+
+  factory InstructorImageUpload.fromMap(map) {
+    return InstructorImageUpload(downlaodurl: map['downloadUrl']);
+  }
+
+  Map<String, dynamic> toMap() {
+    return {'downloadUrl': downlaodurl};
+  }
+}
+
 class CourseModel {
   String? coursetitle;
   String? courterating;
@@ -46,7 +97,7 @@ class CourseModel {
   String? thumbnail;
   String? docid = FirebaseFirestore.instance.collection("Course").doc().id;
   final auth = FirebaseAuth.instance.currentUser;
-  
+
   FirebaseFirestore firebaseFirestore = FirebaseFirestore.instance;
 
   CourseModel(
@@ -71,7 +122,7 @@ class CourseModel {
     return {
       'Coursetitle': coursetitle,
       'Courserating': courterating,
-       "docid" :docid,
+      "docid": docid,
       'price': price,
       'desc': desc,
       'thumbnail': thumbnail

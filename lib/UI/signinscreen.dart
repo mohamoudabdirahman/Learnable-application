@@ -18,6 +18,7 @@ import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:learnable/usermodel/user_model.dart';
 import 'package:loading_indicator/loading_indicator.dart';
 import 'instructor.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class SignIn extends StatefulWidget {
   const SignIn({Key? key}) : super(key: key);
@@ -43,8 +44,6 @@ class _signupState extends State<SignIn> {
 
   final user = auth.FirebaseAuth.instance;
   bool ispressed = true;
-
-
 
   @override
   Widget build(BuildContext context) {
@@ -215,28 +214,42 @@ class _signupState extends State<SignIn> {
   }
 
   void signin(String email, String password) async {
-    UserModel userModel = UserModel();
+    // User? user = FirebaseAuth.instance.currentUser;
+    InstructorModel instructorModel = InstructorModel();
     try {
       if (_formkey.currentState!.validate()) {
+        showDialog(
+            context: context,
+            builder: (context) {
+              return Center(child: CircularProgressIndicator());
+            });
+
         await _Auth.signInWithEmailAndPassword(
             email: email, password: password);
+
+            Navigator.of(context).pop();
+        //shared preferences
+        SharedPreferences prefs = await SharedPreferences.getInstance();
+        prefs.setString('email', emailcontroller.text);
+        //uploading data to firebase
 
         await FirebaseFirestore.instance
             .collection('Users')
             .doc(user.currentUser!.uid)
             .get()
             .then((value) {
-            userModel =  UserModel.fromMap(value.data());
+          loggedInuser = UserModel.fromMap(value.data());
+        });
 
-            setState(() {
-              if(userModel.isinstructor == true){
-                Navigator.pushReplacement(context, MaterialPageRoute(builder: (context)=> InstructorDash()));
-              }else if(userModel.isinstructor == null){
-                Navigator.pushReplacement(context, MaterialPageRoute(builder: (context)=> Homescreen()));
-              }
-              Fluttertoast.showToast(msg: "you are seccusfully Signed In");
-            });
-            });
+        setState(() {
+          if (loggedInuser.isinstructor == null) {
+            Navigator.pushReplacement(
+                context, MaterialPageRoute(builder: (context) => Homescreen()));
+          } else if (loggedInuser.isinstructor == true) {
+            Navigator.pushReplacement(context,
+                MaterialPageRoute(builder: (context) => InstructorDash()));
+          }
+        });
         
       }
     } on auth.FirebaseAuthException catch (error) {

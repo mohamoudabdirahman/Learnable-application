@@ -3,7 +3,9 @@
 import 'dart:async';
 import 'dart:math';
 
+import 'package:another_flushbar/flushbar.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:learnable/UI/homescreen.dart';
 import 'package:learnable/UI/signinscreen.dart';
@@ -13,6 +15,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:learnable/UI/verifyemail.dart';
 import 'package:learnable/usermodel/user_model.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class Signup extends StatefulWidget {
   const Signup({Key? key}) : super(key: key);
@@ -25,8 +28,6 @@ class _SignupState extends State<Signup> {
   //firebase instance
 
   //google sign in
-
-
 
   final _Auth = FirebaseAuth.instance;
 
@@ -44,11 +45,19 @@ class _SignupState extends State<Signup> {
 
   @override
   void initState() {
-    User? user = _Auth.currentUser;
-    user?.sendEmailVerification();
+    try {
+      User? user = _Auth.currentUser;
+      user?.sendEmailVerification();
 
-    timer = Timer.periodic(Duration(seconds: (5)), (timer) {});
-    super.initState();
+      timer = Timer.periodic(Duration(seconds: (5)), (timer) {});
+      super.initState();
+    } catch (e) {
+      Flushbar(
+        message: '$e',
+        duration: Duration(milliseconds: 600),
+        backgroundColor: Colors.lightBlue,
+      );
+    }
   }
 
   @override
@@ -293,12 +302,29 @@ class _SignupState extends State<Signup> {
   void signup(String email, String Password) async {
     try {
       if (_formkey.currentState!.validate()) {
+
+        showDialog(
+            context: context,
+            builder: (context) {
+              return Center(child: CircularProgressIndicator());
+            });
+
+
         await _Auth.createUserWithEmailAndPassword(
                 email: email, password: Password)
-            .then((value) => {postDetailsToFirestore()});
+            .then((value) => 
+            {
+              Navigator.of(context).pop(),
+              postDetailsToFirestore(),
+            });
       }
-    } on FirebaseAuthException catch (error) {
-      Fluttertoast.showToast(msg: "${error.message}");
+    }on PlatformException catch (error) {
+      Flushbar(
+        message: '$error',
+        duration: Duration(seconds: 3),
+        flushbarPosition: FlushbarPosition.TOP,
+        backgroundColor: Colors.lightBlue,
+      );
     }
   }
 
@@ -311,23 +337,25 @@ class _SignupState extends State<Signup> {
     User? user = _Auth.currentUser;
 
     UserModel userModel = UserModel();
+      SharedPreferences sharedPreferences = await SharedPreferences.getInstance();
+
+    sharedPreferences.setBool('isinstructor', false);
 
     //writing values to firestore
-   
-      userModel.email = user!.email;
-      userModel.uid = user.uid;
-      userModel.firstname = firstnamecontroller.text;
-      userModel.lastname = lastnamecontroller.text;
 
-      await firebaseFirestore
-          .collection("Users")
-          .doc(user.uid)
-          .set(userModel.toMap());
-      Fluttertoast.showToast(msg: "Account created successfully");
+    userModel.email = user!.email;
+    userModel.uid = user.uid;
+    userModel.firstname = firstnamecontroller.text;
+    userModel.lastname = lastnamecontroller.text;
 
-      Navigator.of(context).pushReplacement(
-          MaterialPageRoute(builder: (context) => Verify()));
-    
+    await firebaseFirestore
+        .collection("Users")
+        .doc(user.uid)
+        .set(userModel.toMap());
+    Fluttertoast.showToast(msg: "Account created successfully");
+
+    Navigator.of(context)
+        .pushReplacement(MaterialPageRoute(builder: (context) => Verify()));
   }
 
   //Emailing function

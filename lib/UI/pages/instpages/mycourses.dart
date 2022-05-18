@@ -19,6 +19,8 @@ class _MyCoursesState extends State<MyCourses> {
 
   String docid = FirebaseFirestore.instance.collection("Course").doc().id;
 
+  var timestamp;
+
   // @override
   // void initState() {
   //   // TODO: implement initState
@@ -77,19 +79,79 @@ class _MyCoursesState extends State<MyCourses> {
                       ),
                     );
                   }
+                  if (!snapshot.hasData) {
+                    return Center(
+                      child: AlertDialog(
+                        title: Text("Error"),
+                        content: Text("There is no Courses Yet"),
+                      ),
+                    );
+                  }
                   if (snapshot.hasData) {
                     return ListView.builder(
-                        itemCount: 4,
+                        itemCount: snapshot.data!.docs.length,
                         itemBuilder: (context, index) {
-                          return Container(
-                            child: Row(
-                              children: [
-                               Text("${snapshot.data!.docs[index]['coursetitle']}")
-                                
-                              ],
+                          return Padding(
+                            padding: const EdgeInsets.only(
+                                top: 40, right: 20, left: 20),
+                            child: Container(
+                              decoration: BoxDecoration(
+                                  border: Border.all(
+                                      width: 1, color: Colors.lightBlue),
+                                  borderRadius: BorderRadius.circular(20)),
+                              child: Padding(
+                                padding: const EdgeInsets.all(10.0),
+                                child: Row(
+                                  children: [
+                                    Container(
+                                      width: 90,
+                                      height: 70,
+                                      decoration: BoxDecoration(
+                                          color: Colors.lightBlue,
+                                          borderRadius:
+                                              BorderRadius.circular(10)),
+                                      child: ClipRRect(
+                                          borderRadius:
+                                              BorderRadius.circular(10),
+                                          child: Image.network(
+                                            "${snapshot.data!.docs[index]['thumbnail']}",
+                                            errorBuilder:
+                                                ((context, error, stackTrace) {
+                                              return Icon(Icons.do_not_disturb);
+                                            }),
+                                            fit: BoxFit.cover,
+                                          )),
+                                    ),
+                                    SizedBox(
+                                      width: 10.0,
+                                    ),
+                                    Flexible(
+                                      child: Column(
+                                        crossAxisAlignment:
+                                            CrossAxisAlignment.start,
+                                        children: [
+                                          Text(
+                                              "${snapshot.data!.docs[index]['coursetitle']}",
+                                              overflow: TextOverflow.fade,
+                                              style: TextStyle(
+                                                  fontSize: 20,
+                                                  color: Colors.lightBlue)),
+                                          SizedBox(
+                                            height: 10,
+                                          ),
+                                          Text(
+                                              "${snapshot.data!.docs[index]['timestamp']}",
+                                              style: TextStyle(
+                                                  fontSize: 13,
+                                                  color: Colors.grey)),
+                                        ],
+                                      ),
+                                    )
+                                  ],
+                                ),
+                              ),
                             ),
                           );
-                          
                         });
                   }
                   return CircularProgressIndicator();
