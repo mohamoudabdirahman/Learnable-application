@@ -6,12 +6,18 @@ class UserModel {
   String? firstname;
   String? lastname;
   String? email;
+  String? phonenumber;
   bool? isinstructor = false;
   final auth = FirebaseAuth.instance.currentUser;
   FirebaseFirestore firebaseFirestore = FirebaseFirestore.instance;
 
   UserModel(
-      {this.uid, this.firstname, this.lastname, this.email, this.isinstructor});
+      {this.uid,
+      this.firstname,
+      this.lastname,
+      this.email,
+      this.isinstructor,
+      this.phonenumber});
 
   //recieving data from the server
 
@@ -20,6 +26,7 @@ class UserModel {
     return UserModel(
         uid: map[FirebaseAuth.instance.currentUser!.uid],
         firstname: map['First Name'],
+        phonenumber: map['Phone Number'],
         lastname: map['Last Name'],
         email: map['Email'],
         isinstructor: map['Isinstructor']);
@@ -143,5 +150,32 @@ class ChapterModel {
 
   Map<String, dynamic> toMap() {
     return {'chaptitle': chaptertitle, 'vidurl': videolesson};
+  }
+}
+
+class Bookmarks {
+  bool? isbookmarked;
+  String? coursename;
+  String? documentid;
+  String? timestamp;
+  String? thumburl;
+  Bookmarks({this.isbookmarked, this.coursename, this.documentid,this.timestamp,this.thumburl});
+
+  factory Bookmarks.fromMap(map) {
+    return Bookmarks(
+        isbookmarked: map['Isbookmarked'],
+        coursename: map['Course'],
+        documentid: map['DocumentId'],
+        timestamp: map['Timestamp'],
+        thumburl: map['thumburl']);
+  }
+  Map<String, dynamic> toMap() {
+    return {
+      'Isbookmarked': isbookmarked,
+      'Course': coursename,
+      'DocumentId': documentid,
+      'Timestamp' : timestamp,
+      'thumurl' : thumburl
+    };
   }
 }

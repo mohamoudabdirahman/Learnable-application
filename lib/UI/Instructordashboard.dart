@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:learnable/UI/Uploadcoursescreen.dart';
 import 'package:curved_navigation_bar/curved_navigation_bar.dart';
+import 'package:learnable/UI/acountsscreesubscreens/todo.dart';
 import 'package:learnable/UI/details.dart';
 import 'package:learnable/UI/pages/acountscreen.dart';
 import 'package:learnable/UI/pages/instpages/insthomepage.dart';
@@ -19,7 +20,8 @@ class InstructorDash extends StatefulWidget {
 class _InstructorDashState extends State<InstructorDash> {
   int currentindex = 0;
 
-  final List <Widget> _instpages = [Instructorhomepage(),MyCourses(),UploadCourse(),Accountpage()];
+  final List <Widget> _instpages = [Instructorhomepage(),MyCourses(),UploadCourse(),
+ Todoscreen(), Accountpage()];
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -46,6 +48,10 @@ class _InstructorDashState extends State<InstructorDash> {
               ),
               Icon(
                 Icons.add,
+                color: Colors.white,
+              ),
+                Icon(
+                Icons.checklist,
                 color: Colors.white,
               ),
               Icon(

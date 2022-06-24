@@ -4,7 +4,10 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+import 'package:intl/intl.dart';
 import 'package:learnable/UI/util/Courseplaying.dart';
+import 'package:learnable/usermodel/user_model.dart';
+import 'package:loading_indicator/loading_indicator.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:weather_icons/weather_icons.dart';
 
@@ -20,10 +23,43 @@ class Mainpage extends StatefulWidget {
 
 class _MainpageState extends State<Mainpage> {
   String? firstname;
+  String? imageurl;
+  String? lastname;
   String? profilepic;
   FirebaseAuth user = FirebaseAuth.instance;
+  String? formatedate;
+  bool? iswishlisted = false;
+  String? bookmarkedcourse;
+  String? coursename;
+  bool? isbookmarked;
+  Bookmarks bookmarks = Bookmarks();
+  Bookmarks obtainedcourse = Bookmarks();
+  String? coursenames;
+  final auth = FirebaseAuth.instance;
+  List<QueryDocumentSnapshot<Map<String, dynamic>>>? result;
+  String? time;
+  String? picurl;
+  String? docid;
+  String? parentcourse;
+  // void initState() {
+  //   // TODO: implement initState
+  //   super.initState();
+  //   User? user = auth.currentUser;
+  //   FirebaseFirestore.instance
+  //       .collection('Users')
+  //       .doc(user!.uid)
+  //       .collection('Wishlists')
+  //       .get()
+  //       .then((value) {
+  //     //obtainedcourse = Bookmarks.fromMap(value.docs);
+  //     if (value.docs.isNotEmpty) {
+  //       result = value.docs;
+  //     } else {}
+  //     setState(() {});
+  //     //print(result[0]['Course']);
+  //   });
+  // }
 
-  @override
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -164,151 +200,179 @@ class _MainpageState extends State<Mainpage> {
               ),
             ),
             SizedBox(
-              height: 300,
-              child: StreamBuilder(
+                height: 300,
+                child: StreamBuilder(
                   stream: FirebaseFirestore.instance
                       .collection('Users')
                       .where('Isinstructor', isEqualTo: true)
                       .snapshots(),
                   builder: (BuildContext context,
                       AsyncSnapshot<QuerySnapshot> snapshot) {
-                    if (snapshot.connectionState == ConnectionState.waiting) {
-                      return Center(
-                        child: CircularProgressIndicator(),
-                      );
-                    }
-                    if (snapshot.hasData) { 
-                      firstname = snapshot.data!.docs[0]['First Name'];
-                      if (snapshot.data!.docs[0]['Isinstructor'] == true) {
-                        return StreamBuilder(
-                            stream: FirebaseFirestore.instance
-                                .collectionGroup('Course')
-                                .snapshots(),
-                            builder: (BuildContext context,
-                                AsyncSnapshot<QuerySnapshot> snapshot) {
-                              if (snapshot.hasData) {
-                                int number = snapshot.data!.docs.length;
-                                return ListView.builder(
-                                    scrollDirection: Axis.vertical,
-                                    shrinkWrap: true,
-                                    itemCount: number - 1,
-                                    itemBuilder: (context, index) {
-                                      return Padding(
+                    String? useridentity = snapshot.data?.docs[0]['uid'];
+                    firstname = snapshot.data?.docs[0]['First Name'];
+                    lastname = snapshot.data?.docs[0]['Last Name'];
+                    if (snapshot.hasData) {
+                      return StreamBuilder(
+                          stream: FirebaseFirestore.instance
+                              .collection('Users')
+                              .doc(useridentity)
+                              .collection('Course')
+                              .snapshots(),
+                          builder: (BuildContext context,
+                              AsyncSnapshot<QuerySnapshot> snapshot) {
+                            if (snapshot.hasData) {
+                              int number = snapshot.data!.docs.length;
+                              return ListView.builder(
+                                  scrollDirection: Axis.vertical,
+                                  shrinkWrap: true,
+                                  itemCount: number,
+                                  itemBuilder: (context, index) {
+                                    parentcourse =
+                                        snapshot.data?.docs[index]['docid'];
+                                    docid =
+                                        snapshot.data!.docs[index]['OwnerId'];
+                                    imageurl = snapshot.data?.docs[index]
+                                        ['coursetitle'];
+
+                                    coursename = snapshot.data?.docs[index]
+                                        ['coursetitle'];
+                                    time =
+                                        snapshot.data?.docs[index]['timestamp'];
+                                    picurl =
+                                        snapshot.data?.docs[index]['thumbnail'];
+                                    var timestamp =
+                                        snapshot.data?.docs[index]['timestamp'];
+
+                                    var date = DateTime.parse(timestamp);
+                                    formatedate = (DateFormat('yyy')
+                                        .format(date.toUtc()));
+
+                                    return Padding(
                                         padding: const EdgeInsets.only(
                                             top: 20, right: 20, left: 20),
-                                        child: GestureDetector(
-                                          onTap: () async {
-                                            Navigator.pushReplacement(
-                                                context,
-                                                MaterialPageRoute(
-                                                    builder: (context) =>
-                                                        Courseplay(
-                                                          coursetitle: snapshot
-                                                                  .data!
-                                                                  .docs[index]
-                                                              ['coursetitle'],
-                                                          description: snapshot
-                                                                  .data!
-                                                                  .docs[index]
-                                                              ['desc'],
-                                                          firstname: firstname,
-                                                        )));
-                                          },
-                                          child: Container(
-                                            decoration: BoxDecoration(
-                                                color: Colors.white,
-                                                boxShadow: [
-                                                  BoxShadow(
-                                                      color: Colors.grey
-                                                          .withOpacity(0.3),
-                                                      offset: Offset(3, 4),
-                                                      spreadRadius: 1.0,
-                                                      blurRadius: 9.0),
-                                                ],
-                                                borderRadius:
-                                                    BorderRadius.circular(20)),
-                                            child: Padding(
-                                              padding:
-                                                  const EdgeInsets.all(10.0),
-                                              child: Row(
-                                                children: [
-                                                  Container(
-                                                      width: 90,
-                                                      height: 70,
-                                                      decoration: BoxDecoration(
-                                                          color:
-                                                              Colors.lightBlue,
-                                                          borderRadius:
-                                                              BorderRadius
-                                                                  .circular(
-                                                                      10)),
-                                                      child: ClipRRect(
-                                                          borderRadius:
-                                                              BorderRadius
-                                                                  .circular(10),
-                                                          child: Image.network(
-                                                            "${snapshot.data!.docs[index]['thumbnail']}",
-                                                            errorBuilder:
-                                                                ((context,
-                                                                    error,
-                                                                    stackTrace) {
-                                                              return Icon(Icons
-                                                                  .do_not_disturb);
-                                                            }),
-                                                            fit: BoxFit.cover,
-                                                          ))),
-                                                  SizedBox(
-                                                    width: 10.0,
-                                                  ),
-                                                  Flexible(
-                                                    child: Column(
-                                                      crossAxisAlignment:
-                                                          CrossAxisAlignment
-                                                              .start,
-                                                      children: [
-                                                        Text(
-                                                            "${snapshot.data!.docs[index]['coursetitle']}",
-                                                            overflow:
-                                                                TextOverflow
-                                                                    .fade,
-                                                            style: TextStyle(
-                                                                fontSize: 20,
-                                                                color: Colors
-                                                                    .lightBlue)),
-                                                        SizedBox(
-                                                          height: 10,
-                                                        ),
-                                                        Text(
-                                                            "${snapshot.data!.docs[index]['timestamp']}",
-                                                            style: TextStyle(
-                                                                fontSize: 13,
-                                                                color: Colors
-                                                                    .grey)),
-                                                      ],
-                                                    ),
-                                                  )
-                                                ],
-                                              ),
+                                        child: Container(
+                                          decoration: BoxDecoration(
+                                              color: Colors.white,
+                                              boxShadow: [
+                                                BoxShadow(
+                                                    color: Colors.grey
+                                                        .withOpacity(0.3),
+                                                    offset: Offset(3, 4),
+                                                    spreadRadius: 1.0,
+                                                    blurRadius: 9.0),
+                                              ],
+                                              borderRadius:
+                                                  BorderRadius.circular(20)),
+                                          child: Padding(
+                                            padding: const EdgeInsets.all(8.0),
+                                            child: ListTile(
+                                              onTap: (() {
+                                                setState(() {
+                                                  Navigator.pushReplacement(
+                                                      context,
+                                                      MaterialPageRoute(
+                                                          builder:
+                                                              (context) =>
+                                                                  Courseplay(
+                                                                    docid: parentcourse,
+                                                                    ownid:
+                                                                        docid,
+                                                                    coursetitle:
+                                                                        snapshot
+                                                                            .data!
+                                                                            .docs[index]['coursetitle'],
+                                                                    description:
+                                                                        snapshot
+                                                                            .data!
+                                                                            .docs[index]['desc'],
+                                                                    firstname:
+                                                                        firstname,
+                                                                    lastname:
+                                                                        lastname,
+                                                                    courseid: snapshot
+                                                                            .data!
+                                                                            .docs[index]
+                                                                        [
+                                                                        'docid'],
+                                                                  )));
+                                                });
+                                              }),
+                                              leading: Container(
+                                                  width: 90,
+                                                  height: 70,
+                                                  decoration: BoxDecoration(
+                                                      color: Colors.lightBlue,
+                                                      borderRadius:
+                                                          BorderRadius.circular(
+                                                              10)),
+                                                  child: ClipRRect(
+                                                      borderRadius:
+                                                          BorderRadius.circular(
+                                                              10),
+                                                      child: Image.network(
+                                                        "${snapshot.data!.docs[index]['thumbnail']}",
+                                                        errorBuilder: ((context,
+                                                            error, stackTrace) {
+                                                          return Icon(Icons
+                                                              .do_not_disturb);
+                                                        }),
+                                                        fit: BoxFit.cover,
+                                                      ))),
+                                              title: Text(
+                                                  "${snapshot.data!.docs[index]['coursetitle']}",
+                                                  overflow:
+                                                      TextOverflow.ellipsis,
+                                                  style: TextStyle(
+                                                      fontSize: 18,
+                                                      color: Colors.lightBlue)),
+                                              subtitle: Text(
+                                                  formatedate.toString(),
+                                                  style: TextStyle(
+                                                      fontSize: 13,
+                                                      color: Colors.grey)),
                                             ),
                                           ),
-                                        ),
-                                      );
-                                    });
-                              }
-                              return Container();
-                            });
-                      } else {
-                        return Container();
-                      }
+                                        ));
+                                  });
+                            }
+                            return Center(
+                              child: SizedBox(
+                                  height: 60,
+                                  width: 60,
+                                  child: LoadingIndicator(
+                                      indicatorType:
+                                          Indicator.ballRotateChase)),
+                            );
+                          });
                     }
-                    return CircularProgressIndicator();
-                  }),
-            )
+                    return Container();
+                  },
+                ))
           ],
         ),
       ),
     ));
   }
+
+  // void savebookmark() async {
+  //   String docid = FirebaseFirestore.instance
+  //       .collection("Users")
+  //       .doc(user.currentUser!.uid)
+  //       .collection("Wishlists")
+  //       .doc()
+  //       .id;
+  //   isbookmarked = bookmarks.isbookmarked = true;
+  //   coursenames = bookmarks.coursename = coursename;
+  //   bookmarks.documentid = docid;
+  //   bookmarks.timestamp = time;
+  //   bookmarks.thumburl = picurl;
+  //   await FirebaseFirestore.instance
+  //       .collection('Users')
+  //       .doc(user.currentUser!.uid)
+  //       .collection('Wishlists')
+  //       .doc(docid)
+  //       .set(bookmarks.toMap());
+  // }
 
   gettime() {
     var hour = TimeOfDay.now().hour;

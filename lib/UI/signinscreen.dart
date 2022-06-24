@@ -7,8 +7,10 @@ import 'dart:ui';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:learnable/UI/Instructordashboard.dart';
+import 'package:learnable/UI/acountsscreesubscreens/resetpassword.dart';
 import 'package:learnable/UI/choice.dart';
 import 'package:learnable/UI/homescreen.dart';
 import 'package:learnable/UI/signupscreen.dart';
@@ -158,12 +160,31 @@ class _signupState extends State<SignIn> {
                               hintText: "password",
                             )),
                         SizedBox(
+                          height: 10,
+                        ),
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.end,
+                          children: [
+                            GestureDetector(
+                              onTap: () {
+                                Navigator.push(
+                                    context,
+                                    MaterialPageRoute(
+                                        builder: ((context) => Resetpass())));
+                              },
+                              child: Text(
+                                'Forgot Your Password?',
+                                style: TextStyle(color: Colors.lightBlue),
+                              ),
+                            )
+                          ],
+                        ),
+                        SizedBox(
                           height: 25.0,
                         ),
                         MaterialButton(
                           onPressed: () {
-                            signin(
-                                emailcontroller.text, passwordcontroller.text);
+                            signin(emailcontroller.text);
                           },
                           color: Colors.lightBlue,
                           child: Text(
@@ -213,7 +234,7 @@ class _signupState extends State<SignIn> {
             ))));
   }
 
-  void signin(String email, String password) async {
+  void signin(String phonenumber) async {
     // User? user = FirebaseAuth.instance.currentUser;
     InstructorModel instructorModel = InstructorModel();
     try {
@@ -221,16 +242,23 @@ class _signupState extends State<SignIn> {
         showDialog(
             context: context,
             builder: (context) {
-              return Center(child: CircularProgressIndicator());
+              return Center(
+                  child: SizedBox(
+                      height: 50,
+                      width: 50,
+                      child: LoadingIndicator(
+                        indicatorType: Indicator.ballRotateChase,
+                      )));
             });
 
         await _Auth.signInWithEmailAndPassword(
-            email: email, password: password);
+            email: emailcontroller.text, password: passwordcontroller.text);
 
-            Navigator.of(context).pop();
+        Navigator.of(context).pop();
         //shared preferences
         SharedPreferences prefs = await SharedPreferences.getInstance();
         prefs.setString('email', emailcontroller.text);
+        prefs.setString('id', user.currentUser!.uid);
         //uploading data to firebase
 
         await FirebaseFirestore.instance
@@ -242,7 +270,7 @@ class _signupState extends State<SignIn> {
         });
 
         setState(() {
-          if (loggedInuser.isinstructor == null) {
+          if (loggedInuser.isinstructor == false) {
             Navigator.pushReplacement(
                 context, MaterialPageRoute(builder: (context) => Homescreen()));
           } else if (loggedInuser.isinstructor == true) {
@@ -250,9 +278,9 @@ class _signupState extends State<SignIn> {
                 MaterialPageRoute(builder: (context) => InstructorDash()));
           }
         });
-        
       }
     } on auth.FirebaseAuthException catch (error) {
+      Navigator.pop(context);
       Fluttertoast.showToast(msg: "${error.message}");
     }
   }

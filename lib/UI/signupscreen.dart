@@ -1,13 +1,15 @@
-// ignore_for_file: prefer_const_constructors, prefer_const_literals_to_create_immutables
+// ignore_for_file: prefer_const_constructors, prefer_const_literals_to_create_immutables, non_constant_identifier_names
 
 import 'dart:async';
 import 'dart:math';
 
 import 'package:another_flushbar/flushbar.dart';
+import 'package:flutter_pw_validator/flutter_pw_validator.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:learnable/UI/homescreen.dart';
+import 'package:learnable/UI/phonenumber.dart';
 import 'package:learnable/UI/signinscreen.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
@@ -15,6 +17,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:learnable/UI/verifyemail.dart';
 import 'package:learnable/usermodel/user_model.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+import 'package:loading_indicator/loading_indicator.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class Signup extends StatefulWidget {
@@ -27,8 +30,6 @@ class Signup extends StatefulWidget {
 class _SignupState extends State<Signup> {
   //firebase instance
 
-  //google sign in
-
   final _Auth = FirebaseAuth.instance;
 
   final GlobalKey<FormState> _formkey = GlobalKey<FormState>();
@@ -40,31 +41,6 @@ class _SignupState extends State<Signup> {
   final emailcontroller = TextEditingController();
   final passwordcontroller = TextEditingController();
   final confirmpasswordcontroller = TextEditingController();
-
-  late Timer timer;
-
-  @override
-  void initState() {
-    try {
-      User? user = _Auth.currentUser;
-      user?.sendEmailVerification();
-
-      timer = Timer.periodic(Duration(seconds: (5)), (timer) {});
-      super.initState();
-    } catch (e) {
-      Flushbar(
-        message: '$e',
-        duration: Duration(milliseconds: 600),
-        backgroundColor: Colors.lightBlue,
-      );
-    }
-  }
-
-  @override
-  void dispose() {
-    timer.cancel();
-    super.dispose();
-  }
 
   @override
   Widget build(BuildContext context) {
@@ -121,7 +97,7 @@ class _SignupState extends State<Signup> {
                           height: 10.0,
                         ),
                         Text(
-                          "Sign Up to continue",
+                          "Continue to Sign Up as a student",
                           style: TextStyle(
                             color: Colors.white,
                           ),
@@ -221,16 +197,6 @@ class _SignupState extends State<Signup> {
                         TextFormField(
                             controller: passwordcontroller,
                             obscureText: true,
-                            validator: (value) {
-                              RegExp regex = RegExp(r'^.{6,}$');
-                              if (value!.isEmpty) {
-                                return ("Password is required for login");
-                              }
-                              if (!regex.hasMatch(value)) {
-                                return ("Enter Valid Password(Min. 6 Character)");
-                              }
-                              return null;
-                            },
                             onSaved: (value) {
                               passwordcontroller.text = value!;
                             },
@@ -245,6 +211,15 @@ class _SignupState extends State<Signup> {
                               //filled: true,
                               hintText: "password",
                             )),
+                        FlutterPwValidator(
+                            width: 400,
+                            height: 150,
+                            minLength: 8,
+                            onSuccess: () {},
+                            uppercaseCharCount: 1,
+                            numericCharCount: 1,
+                            specialCharCount: 1,
+                            controller: passwordcontroller),
                         SizedBox(
                           height: 15.0,
                         ),
@@ -302,23 +277,27 @@ class _SignupState extends State<Signup> {
   void signup(String email, String Password) async {
     try {
       if (_formkey.currentState!.validate()) {
-
         showDialog(
             context: context,
             builder: (context) {
-              return Center(child: CircularProgressIndicator());
+              return Center(
+                  child: SizedBox(
+                      width: 60,
+                      height: 60,
+                      child: LoadingIndicator(
+                        indicatorType: Indicator.ballRotateChase,
+                      )));
             });
-
 
         await _Auth.createUserWithEmailAndPassword(
                 email: email, password: Password)
-            .then((value) => 
-            {
-              Navigator.of(context).pop(),
-              postDetailsToFirestore(),
-            });
+            .then((value) => {
+                  Navigator.of(context).pop(),
+                  postDetailsToFirestore(),
+                });
       }
-    }on PlatformException catch (error) {
+    } on PlatformException catch (error) {
+      Navigator.of(context).pop();
       Flushbar(
         message: '$error',
         duration: Duration(seconds: 3),
@@ -337,7 +316,7 @@ class _SignupState extends State<Signup> {
     User? user = _Auth.currentUser;
 
     UserModel userModel = UserModel();
-      SharedPreferences sharedPreferences = await SharedPreferences.getInstance();
+    SharedPreferences sharedPreferences = await SharedPreferences.getInstance();
 
     sharedPreferences.setBool('isinstructor', false);
 
@@ -347,15 +326,15 @@ class _SignupState extends State<Signup> {
     userModel.uid = user.uid;
     userModel.firstname = firstnamecontroller.text;
     userModel.lastname = lastnamecontroller.text;
-
+    userModel.isinstructor = false;
     await firebaseFirestore
         .collection("Users")
         .doc(user.uid)
         .set(userModel.toMap());
     Fluttertoast.showToast(msg: "Account created successfully");
 
-    Navigator.of(context)
-        .pushReplacement(MaterialPageRoute(builder: (context) => Verify()));
+    Navigator.of(context).pushReplacement(
+        MaterialPageRoute(builder: (context) => Phonenumber()));
   }
 
   //Emailing function

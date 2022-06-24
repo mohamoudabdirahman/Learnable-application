@@ -15,7 +15,7 @@ class _InstructorhomepageState extends State<Instructorhomepage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-body: SafeArea(
+      body: SafeArea(
           child: Container(
         width: MediaQuery.of(context).size.width,
         height: MediaQuery.of(context).size.height,
@@ -62,7 +62,7 @@ body: SafeArea(
                   children: [
                     Text(
                       '''Upload your first
-    Course''',
+lessons''',
                       textAlign: TextAlign.start,
                       style: TextStyle(
                           fontSize: 25.0,
@@ -110,8 +110,8 @@ body: SafeArea(
                 child: Center(
                     child: Text(
                   "N/A",
-                  style:
-                      TextStyle(fontSize: 18.0, color: Colors.lightBlue.shade400),
+                  style: TextStyle(
+                      fontSize: 18.0, color: Colors.lightBlue.shade400),
                 ))),
           ],
         ),

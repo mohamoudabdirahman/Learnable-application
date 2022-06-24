@@ -15,7 +15,9 @@ import 'package:image_picker/image_picker.dart';
 import 'package:learnable/UI/Instructordashboard.dart';
 import 'package:learnable/UI/homescreen.dart';
 import 'package:learnable/usermodel/user_model.dart';
+import 'package:loading_indicator/loading_indicator.dart';
 import 'package:lottie/lottie.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class Profilepic extends StatefulWidget {
   const Profilepic({Key? key}) : super(key: key);
@@ -44,17 +46,17 @@ class _ProfilepicState extends State<Profilepic> {
     });
   }
 
-  Future uploadimages() async {
-    FirebaseFirestore.instance;
-    Reference ref = FirebaseStorage.instance.ref().child(user!.uid).child('profile picture').child('profilepic');
-    await ref.putFile(_image!);
-    downloadUrl = await ref.getDownloadURL();
-
-    await FirebaseFirestore.instance
-        .collection("Users")
+  @override
+  void initState() {
+    // TODO: implement initState
+    super.initState();
+    FirebaseFirestore.instance
+        .collection('Users')
         .doc(user!.uid)
-        .collection("images")
-        .add({'downloadUrl': downloadUrl});
+        .get()
+        .then((value) {
+      loggedinUser = UserModel.fromMap(value.data());
+    });
   }
 
   @override
@@ -67,7 +69,7 @@ class _ProfilepicState extends State<Profilepic> {
             crossAxisAlignment: CrossAxisAlignment.center,
             children: [
               Lottie.network(
-                  "https://assets2.lottiefiles.com/packages/lf20_1ofivjat.json",
+                  "https://assets5.lottiefiles.com/packages/lf20_owggins0.json",
                   height: 250),
               Center(
                 child: Stack(children: [
@@ -139,13 +141,12 @@ class _ProfilepicState extends State<Profilepic> {
                   MaterialButton(
                     onPressed: () {
                       if (_image != null) {
-                        uploadimages().whenComplete(() => decider()).whenComplete(() => showSnackBar(
-                            "Succesfully uploaded your image",
-                            Duration(milliseconds: 300)));
+                        uploadimages();
                       } else {
                         showSnackBar("No images is selected",
                             Duration(microseconds: 1000));
-                    }},
+                      }
+                    },
                     color: Colors.lightBlue,
                     child: Text(
                       "Finish",
@@ -172,19 +173,44 @@ class _ProfilepicState extends State<Profilepic> {
     ScaffoldMessenger.of(context).showSnackBar(snackBar);
   }
 
-  decider() async {
+  Future uploadimages() async {
+    showDialog(
+        context: context,
+        builder: (context) {
+          return Center(
+              child: SizedBox(
+                  width: 60,
+                  height: 60,
+                  child: LoadingIndicator(
+                    indicatorType: Indicator.ballRotateChase,
+                  )));
+        });
+    FirebaseFirestore.instance;
+    Reference ref = FirebaseStorage.instance
+        .ref()
+        .child(user!.uid)
+        .child('profile picture')
+        .child('profilepic');
+    await ref.putFile(_image!);
+    downloadUrl = await ref.getDownloadURL();
+
     await FirebaseFirestore.instance
-        .collection('Users')
+        .collection("Users")
         .doc(user!.uid)
-        .get()
-        .then((value) => loggedinUser = UserModel.fromMap(value.data()));
+        .set({'downloadUrl': downloadUrl},SetOptions(merge: true)).then((value) => {
+              showSnackBar(
+                  'you have successfully uploaded your profile picture 🎉',
+                  Duration(milliseconds: 600))
+            });
+    Navigator.pop(context);
     
-    if(loggedinUser.isinstructor == null){
-      Navigator.pushReplacement(
-        context, MaterialPageRoute(builder: ((context) => Homescreen())));
-    }else if(loggedinUser.isinstructor == true ){
-      Navigator.pushReplacement(
-        context, MaterialPageRoute(builder: ((context) => InstructorDash())));
+    if (loggedinUser.isinstructor == false) {
+      Navigator.push(
+          context, MaterialPageRoute(builder: ((context) => Homescreen())));
+    }else if(loggedinUser.isinstructor == true)
+    {
+       Navigator.push(
+          context, MaterialPageRoute(builder: ((context) => InstructorDash())));
     }
   }
 }

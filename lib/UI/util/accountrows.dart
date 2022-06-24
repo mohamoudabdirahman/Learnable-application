@@ -3,13 +3,18 @@ import 'package:google_fonts/google_fonts.dart';
 
 import '../mylearning.dart';
 
-class ProfileRows extends StatelessWidget {
+class ProfileRows extends StatefulWidget {
   String? iconimage;
   String? title;
 
   ProfileRows({Key? key, required this.iconimage, required this.title})
       : super(key: key);
 
+  @override
+  State<ProfileRows> createState() => _ProfileRowsState();
+}
+
+class _ProfileRowsState extends State<ProfileRows> {
   @override
   Widget build(BuildContext context) {
     return Padding(
@@ -37,12 +42,12 @@ class ProfileRows extends StatelessWidget {
             ),
             // ignore: prefer_const_constructors
             child:
-                Image(color: Colors.lightBlue, image: AssetImage(iconimage!)),
+                Image(color: Colors.lightBlue, image: AssetImage(widget.iconimage!),height: 40),
           ),
-          SizedBox(
+          const SizedBox(
             width: 10.0,
           ),
-          Text(title!,
+          Text(widget.title!,
               style:
                   GoogleFonts.roboto(fontSize: 18.0, color: Colors.lightBlue))
         ],
