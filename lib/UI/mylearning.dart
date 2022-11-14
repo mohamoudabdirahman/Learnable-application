@@ -5,9 +5,9 @@ class MyLearning extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Center(
-      child: Container(
-        child: Text("My learnings"),
+    return Scaffold(
+      body: Center(
+        child: Text("Coming soon 🧐, Work in progress!"),
       ),
     );
   }

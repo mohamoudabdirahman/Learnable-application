@@ -27,7 +27,6 @@ class _MyCoursesState extends State<MyCourses> {
   ChapterModel lesson = ChapterModel();
 
   String docid = FirebaseFirestore.instance.collection("Course").doc().id;
-
   var timestamp;
 
   // @override
@@ -122,6 +121,8 @@ class _MyCoursesState extends State<MyCourses> {
                   }
                   if (snapshot.hasData) {
                     return ListView.builder(
+                        physics: ScrollPhysics(),
+                        shrinkWrap: true,
                         itemCount: snapshot.data!.docs.length,
                         itemBuilder: (context, index) {
                           String? thumb =
@@ -161,22 +162,18 @@ class _MyCoursesState extends State<MyCourses> {
                                                               .doc(docid)
                                                               .delete();
 
-                                                          
-                                                              FirebaseFirestore
-                                                                  .instance
-                                                                  .collection(
-                                                                      'Users')
-                                                                  .doc(
-                                                                      user!.uid)
-                                                                  .collection(
-                                                                      'Course')
-                                                                  .doc(docid)
-                                                                  .collection(
-                                                                      'videolessons')
-                                                                  .doc()
-                                                                  .delete();
-
-                                                         
+                                                          FirebaseFirestore
+                                                              .instance
+                                                              .collection(
+                                                                  'Users')
+                                                              .doc(user!.uid)
+                                                              .collection(
+                                                                  'Course')
+                                                              .doc(docid)
+                                                              .collection(
+                                                                  'videolessons')
+                                                              .doc()
+                                                              .delete();
 
                                                           Navigator.pop(
                                                               context);

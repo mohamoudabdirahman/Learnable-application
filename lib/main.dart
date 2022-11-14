@@ -28,7 +28,6 @@ Future<void> main() async {
 class MyApp extends StatelessWidget {
   var os = Platform.operatingSystem;
   User? user = FirebaseAuth.instance.currentUser;
-  
   bool? switchstate;
   MyApp({Key? key}) : super(key: key);
 
@@ -36,13 +35,8 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
-      theme: ThemeData(
-        primarySwatch: Colors.blue,
-        // brightness: Brightness.dark
-      ),
+      theme: ThemeData(primarySwatch: Colors.blue, brightness: Brightness.light),
       home: const SplashScreen(),
     );
   }
-
-
 }

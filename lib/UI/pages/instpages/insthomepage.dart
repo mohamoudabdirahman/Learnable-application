@@ -62,7 +62,7 @@ class _InstructorhomepageState extends State<Instructorhomepage> {
                   children: [
                     Text(
                       '''Upload your first
-lessons''',
+Course''',
                       textAlign: TextAlign.start,
                       style: TextStyle(
                           fontSize: 25.0,

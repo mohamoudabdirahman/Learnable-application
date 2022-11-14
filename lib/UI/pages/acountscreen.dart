@@ -10,6 +10,7 @@ import 'package:learnable/UI/acountsscreesubscreens/todo.dart';
 import 'package:learnable/UI/acountsscreesubscreens/wishlist.dart';
 import 'package:learnable/UI/homescreen.dart';
 import 'package:learnable/UI/mylearning.dart';
+import 'package:learnable/UI/pages/instpages/mycourses.dart';
 import 'package:learnable/UI/pages/mainpage.dart';
 import 'package:learnable/UI/signinscreen.dart';
 import 'package:learnable/UI/util/accountrows.dart';
@@ -98,26 +99,31 @@ class _AccountpageState extends State<Accountpage> {
                           color: Colors.lightBlue,
                           borderRadius: BorderRadius.circular(8)),
                       width: 350,
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceAround,
-                        children: [
-                          Text(
-                            ispressed == true ? "Dark Mode" : 'Light mode',
-                            style:
-                                TextStyle(fontSize: 16.0, color: Colors.white),
-                          ),
-                          SizedBox(
-                            width: 10.0,
-                          ),
-                          Switch.adaptive(
-                              value: ispressed,
-                              onChanged: (value) {
-                                setState(() {
-                                  ispressed = value;
-                                });
-                              })
-                        ],
-                      ),
+                      // child: Row(
+                      //   mainAxisAlignment: MainAxisAlignment.spaceAround,
+                      //   children: [
+                      //     Text(
+                      //       ispressed == true ? "Dark Mode" : 'Light mode',
+                      //       style:
+                      //           TextStyle(fontSize: 16.0, color: Colors.white),
+                      //     ),
+                      //     SizedBox(
+                      //       width: 10.0,
+                      //     ),
+                      //     // Switch.adaptive(
+                      //     //     value: ispressed,
+                      //     //     onChanged: (value) async {
+                      //     //       setState(() {
+                      //     //         ispressed = value;
+                      //     //       });
+                      //     //       SharedPreferences prefs =
+                      //     //           await SharedPreferences.getInstance();
+                      //     //       Future<bool> val =
+                      //     //           prefs.setBool('mode', ispressed);
+                                
+                      //     //     })
+                      //   ],
+                      // ),
                     ),
                   ),
                   SizedBox(
@@ -143,13 +149,28 @@ class _AccountpageState extends State<Accountpage> {
                             left: 52.0, top: 62.0, right: 53.0),
                         child: Column(
                           children: [
-                            ProfileRows(
-                                iconimage: loggedInUser.isinstructor == true
-                                    ? 'lib/images/courses.png'
-                                    : 'lib/images/Group 1.png',
-                                title: loggedInUser.isinstructor == true
-                                    ? 'My courses'
-                                    : 'My Learnings'),
+                            GestureDetector(
+                              onTap: () {
+                                loggedInUser.isinstructor == true
+                                    ? Navigator.push(
+                                        context,
+                                        MaterialPageRoute(
+                                            builder: ((context) =>
+                                                MyCourses())))
+                                    : Navigator.push(
+                                        context,
+                                        MaterialPageRoute(
+                                            builder: ((context) =>
+                                                MyLearning())));
+                              },
+                              child: ProfileRows(
+                                  iconimage: loggedInUser.isinstructor == true
+                                      ? 'lib/images/courses.png'
+                                      : 'lib/images/Group 1.png',
+                                  title: loggedInUser.isinstructor == true
+                                      ? 'My courses'
+                                      : 'My Learnings'),
+                            ),
                             GestureDetector(
                               onTap: () {
                                 Navigator.push(

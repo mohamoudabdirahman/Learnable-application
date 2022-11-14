@@ -1,5 +1,6 @@
 // ignore_for_file: prefer_const_constructors, prefer_const_literals_to_create_immutables
 
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
@@ -22,7 +23,6 @@ class Mainpage extends StatefulWidget {
 }
 
 class _MainpageState extends State<Mainpage> {
-  String? firstname;
   String? imageurl;
   String? lastname;
   String? profilepic;
@@ -41,6 +41,7 @@ class _MainpageState extends State<Mainpage> {
   String? picurl;
   String? docid;
   String? parentcourse;
+  String? firstname;
   // void initState() {
   //   // TODO: implement initState
   //   super.initState();
@@ -151,31 +152,6 @@ class _MainpageState extends State<Mainpage> {
                     SizedBox(
                       height: 30,
                     ),
-                    Container(
-                      height: 38,
-                      child: TextFormField(
-                        decoration: InputDecoration(
-                            border: OutlineInputBorder(
-                                borderRadius: BorderRadius.circular(12)),
-                            contentPadding: EdgeInsets.all(15.0),
-                            fillColor: Colors.white,
-                            filled: true,
-                            suffixIcon: GestureDetector(
-                                onTap: () {},
-                                child: Icon(
-                                  FontAwesomeIcons.search,
-                                  size: 18,
-                                )),
-                            enabledBorder: OutlineInputBorder(
-                                borderSide: BorderSide(
-                                    color: Colors.lightBlue, width: 2.0),
-                                borderRadius: BorderRadius.circular(12)),
-                            hintText: "Search Courses",
-                            hintStyle: TextStyle(
-                                fontSize: 12, color: Colors.lightBlue)),
-                        style: TextStyle(fontSize: 14),
-                      ),
-                    )
                   ],
                 ),
               ),
@@ -209,141 +185,179 @@ class _MainpageState extends State<Mainpage> {
                   builder: (BuildContext context,
                       AsyncSnapshot<QuerySnapshot> snapshot) {
                     String? useridentity = snapshot.data?.docs[0]['uid'];
-                    firstname = snapshot.data?.docs[0]['First Name'];
-                    lastname = snapshot.data?.docs[0]['Last Name'];
+
                     if (snapshot.hasData) {
-                      return StreamBuilder(
-                          stream: FirebaseFirestore.instance
-                              .collection('Users')
-                              .doc(useridentity)
-                              .collection('Course')
-                              .snapshots(),
-                          builder: (BuildContext context,
-                              AsyncSnapshot<QuerySnapshot> snapshot) {
-                            if (snapshot.hasData) {
-                              int number = snapshot.data!.docs.length;
-                              return ListView.builder(
-                                  scrollDirection: Axis.vertical,
-                                  shrinkWrap: true,
-                                  itemCount: number,
-                                  itemBuilder: (context, index) {
-                                    parentcourse =
-                                        snapshot.data?.docs[index]['docid'];
-                                    docid =
-                                        snapshot.data!.docs[index]['OwnerId'];
-                                    imageurl = snapshot.data?.docs[index]
-                                        ['coursetitle'];
+                      return ListView.builder(
+                        itemCount: snapshot.data?.docs.length,
+                        itemBuilder: (contex, index) {
+                          String? useridentity =
+                              snapshot.data?.docs[index]['uid'];
+                          firstname = snapshot.data?.docs[index]['First Name'];
+                          // print(firstname);
+                          lastname = snapshot.data?.docs[index]['Last Name'];
+                          //print(lastname);
+                          return StreamBuilder(
+                              stream: FirebaseFirestore.instance
+                                  .collection('Users')
+                                  .doc(useridentity)
+                                  .collection('Course')
+                                  .snapshots(),
+                              builder: (BuildContext context,
+                                  AsyncSnapshot<QuerySnapshot> snapshot) {
+                                if (snapshot.hasData) {
+                                  int number = snapshot.data!.docs.length;
+                                  return ListView.builder(
+                                      scrollDirection: Axis.vertical,
+                                      shrinkWrap: true,
+                                      itemCount: number,
+                                      itemBuilder: (context, index) {
+                                        parentcourse =
+                                            snapshot.data?.docs[index]['docid'];
+                                        docid = snapshot.data!.docs[index]
+                                            ['OwnerId'];
+                                        print(docid);
+                                        imageurl = snapshot.data?.docs[index]
+                                            ['coursetitle'];
 
-                                    coursename = snapshot.data?.docs[index]
-                                        ['coursetitle'];
-                                    time =
-                                        snapshot.data?.docs[index]['timestamp'];
-                                    picurl =
-                                        snapshot.data?.docs[index]['thumbnail'];
-                                    var timestamp =
-                                        snapshot.data?.docs[index]['timestamp'];
+                                        coursename = snapshot.data?.docs[index]
+                                            ['coursetitle'];
+                                        time = snapshot.data?.docs[index]
+                                            ['timestamp'];
+                                        picurl = snapshot.data?.docs[index]
+                                            ['thumbnail'];
+                                        var timestamp = snapshot
+                                            .data?.docs[index]['timestamp'];
 
-                                    var date = DateTime.parse(timestamp);
-                                    formatedate = (DateFormat('yyy')
-                                        .format(date.toUtc()));
+                                        var date = DateTime.parse(timestamp);
+                                        formatedate = (DateFormat('yyy')
+                                            .format(date.toUtc()));
 
-                                    return Padding(
-                                        padding: const EdgeInsets.only(
-                                            top: 20, right: 20, left: 20),
-                                        child: Container(
-                                          decoration: BoxDecoration(
-                                              color: Colors.white,
-                                              boxShadow: [
-                                                BoxShadow(
-                                                    color: Colors.grey
-                                                        .withOpacity(0.3),
-                                                    offset: Offset(3, 4),
-                                                    spreadRadius: 1.0,
-                                                    blurRadius: 9.0),
-                                              ],
-                                              borderRadius:
-                                                  BorderRadius.circular(20)),
-                                          child: Padding(
-                                            padding: const EdgeInsets.all(8.0),
-                                            child: ListTile(
-                                              onTap: (() {
-                                                setState(() {
-                                                  Navigator.pushReplacement(
-                                                      context,
-                                                      MaterialPageRoute(
-                                                          builder:
-                                                              (context) =>
-                                                                  Courseplay(
-                                                                    docid: parentcourse,
-                                                                    ownid:
-                                                                        docid,
-                                                                    coursetitle:
-                                                                        snapshot
+                                        return Padding(
+                                            padding: const EdgeInsets.only(
+                                                top: 20, right: 20, left: 20),
+                                            child: Container(
+                                              decoration: BoxDecoration(
+                                                  color: Colors.white,
+                                                  boxShadow: [
+                                                    BoxShadow(
+                                                        color: Colors.grey
+                                                            .withOpacity(0.3),
+                                                        offset: Offset(3, 4),
+                                                        spreadRadius: 1.0,
+                                                        blurRadius: 9.0),
+                                                  ],
+                                                  borderRadius:
+                                                      BorderRadius.circular(
+                                                          20)),
+                                              child: Padding(
+                                                padding:
+                                                    const EdgeInsets.all(8.0),
+                                                child: ListTile(
+                                                  onTap: (() {
+                                                    //print(docid);
+                                                    setState(() {
+                                                      Navigator.pushReplacement(
+                                                          context,
+                                                          MaterialPageRoute(
+                                                              builder:
+                                                                  (context) =>
+                                                                      Courseplay(
+                                                                        docid:
+                                                                            snapshot
+                                                                            .data!
+                                                                            .docs[index]['docid'],
+                                                                        ownid: snapshot
+                                                                            .data!
+                                                                            .docs[index]['OwnerId'],
+                                                                        coursetitle: snapshot
                                                                             .data!
                                                                             .docs[index]['coursetitle'],
-                                                                    description:
-                                                                        snapshot
+                                                                        description: snapshot
                                                                             .data!
                                                                             .docs[index]['desc'],
-                                                                    firstname:
-                                                                        firstname,
-                                                                    lastname:
-                                                                        lastname,
-                                                                    courseid: snapshot
+                                                                        courseid: snapshot
                                                                             .data!
-                                                                            .docs[index]
-                                                                        [
-                                                                        'docid'],
-                                                                  )));
-                                                });
-                                              }),
-                                              leading: Container(
-                                                  width: 90,
-                                                  height: 70,
-                                                  decoration: BoxDecoration(
-                                                      color: Colors.lightBlue,
-                                                      borderRadius:
-                                                          BorderRadius.circular(
-                                                              10)),
-                                                  child: ClipRRect(
-                                                      borderRadius:
-                                                          BorderRadius.circular(
-                                                              10),
-                                                      child: Image.network(
-                                                        "${snapshot.data!.docs[index]['thumbnail']}",
-                                                        errorBuilder: ((context,
-                                                            error, stackTrace) {
-                                                          return Icon(Icons
-                                                              .do_not_disturb);
-                                                        }),
-                                                        fit: BoxFit.cover,
-                                                      ))),
-                                              title: Text(
-                                                  "${snapshot.data!.docs[index]['coursetitle']}",
-                                                  overflow:
-                                                      TextOverflow.ellipsis,
-                                                  style: TextStyle(
-                                                      fontSize: 18,
-                                                      color: Colors.lightBlue)),
-                                              subtitle: Text(
-                                                  formatedate.toString(),
-                                                  style: TextStyle(
-                                                      fontSize: 13,
-                                                      color: Colors.grey)),
-                                            ),
-                                          ),
-                                        ));
-                                  });
-                            }
-                            return Center(
-                              child: SizedBox(
-                                  height: 60,
-                                  width: 60,
-                                  child: LoadingIndicator(
-                                      indicatorType:
-                                          Indicator.ballRotateChase)),
-                            );
-                          });
+                                                                            .docs[index]['docid'],
+                                                                      )));
+                                                    });
+                                                  }),
+                                                  leading: Container(
+                                                      width: 90,
+                                                      height: 70,
+                                                      decoration: BoxDecoration(
+                                                          color:
+                                                              Colors.lightBlue,
+                                                          borderRadius:
+                                                              BorderRadius
+                                                                  .circular(
+                                                                      10)),
+                                                      child: ClipRRect(
+                                                          borderRadius:
+                                                              BorderRadius
+                                                                  .circular(10),
+                                                          child:
+                                                              CachedNetworkImage(
+                                                            imageUrl:
+                                                                '${snapshot.data?.docs[index]['thumbnail']}',
+                                                            height: 70,
+                                                            width: 90,
+                                                            maxHeightDiskCache:
+                                                                250,
+                                                            fit: BoxFit.cover,
+                                                            errorWidget:
+                                                                (context, url,
+                                                                    error) {
+                                                              return Center(
+                                                                child: Icon(
+                                                                  Icons.error,
+                                                                  color: Colors
+                                                                      .red,
+                                                                ),
+                                                              );
+                                                            },
+                                                            placeholder: (context,
+                                                                    imageurl) =>
+                                                                Center(
+                                                                    child: SizedBox(
+                                                                        height: 50,
+                                                                        width: 50,
+                                                                        child: LoadingIndicator(
+                                                                          indicatorType:
+                                                                              Indicator.ballRotateChase,
+                                                                          colors: [
+                                                                            Colors.white
+                                                                          ],
+                                                                        ))),
+                                                          ))),
+                                                  title: Text(
+                                                      "${snapshot.data!.docs[index]['coursetitle']}",
+                                                      overflow:
+                                                          TextOverflow.ellipsis,
+                                                      style: TextStyle(
+                                                          fontSize: 18,
+                                                          color: Colors
+                                                              .lightBlue)),
+                                                  subtitle: Text(
+                                                      formatedate.toString(),
+                                                      style: TextStyle(
+                                                          fontSize: 13,
+                                                          color: Colors.grey)),
+                                                ),
+                                              ),
+                                            ));
+                                      });
+                                }
+                                return Center(
+                                  child: SizedBox(
+                                      height: 60,
+                                      width: 60,
+                                      child: LoadingIndicator(
+                                          indicatorType:
+                                              Indicator.ballRotateChase)),
+                                );
+                              });
+                        },
+                      );
                     }
                     return Container();
                   },

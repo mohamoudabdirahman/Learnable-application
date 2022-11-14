@@ -10,6 +10,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
+import 'package:learnable/UI/Instructordashboard.dart';
 import 'package:learnable/UI/util/dynamiccoursefield.dart';
 import 'package:learnable/usermodel/user_model.dart';
 import 'package:liquid_progress_indicator/liquid_progress_indicator.dart';
@@ -96,6 +97,12 @@ class _UploadCourseState extends State<UploadCourse> {
       appBar: AppBar(
         title: Text('Create Course'),
         centerTitle: true,
+        leading: IconButton(
+            onPressed: () {
+              Navigator.push(context,
+                  MaterialPageRoute(builder: ((context) => InstructorDash())));
+            },
+            icon: Icon(Icons.arrow_back)),
       ),
       body: SafeArea(
         child: Padding(
@@ -203,8 +210,11 @@ class _UploadCourseState extends State<UploadCourse> {
                           itemCount: dynamicwidget.length,
                           itemBuilder: (context, index) =>
                               dynamicwidget[index]),
-                       AvatarGlow(
-                        endRadius: 30, glowColor: Colors.lightBlue, duration: Duration(milliseconds: 5000),repeatPauseDuration: Duration(milliseconds: 1000),
+                      AvatarGlow(
+                        endRadius: 30,
+                        glowColor: Colors.lightBlue,
+                        duration: Duration(milliseconds: 5000),
+                        repeatPauseDuration: Duration(milliseconds: 1000),
                         child: IconButton(
                             onPressed: () {
                               //getvideos();
@@ -213,7 +223,10 @@ class _UploadCourseState extends State<UploadCourse> {
                                 adddynamic();
                               });
                             },
-                            icon: Icon(Icons.add,color: Colors.deepOrange,)),
+                            icon: Icon(
+                              Icons.add,
+                              color: Colors.deepOrange,
+                            )),
                       ),
                       SizedBox(
                         height: 20,
@@ -308,9 +321,9 @@ class _UploadCourseState extends State<UploadCourse> {
           'docid': docid,
           'timestamp': DateTime.now().toString(),
           'price': null,
-          'OwnerId' : user.uid,
+          'OwnerId': user.uid,
           'thumbnail': thumburl
-        },SetOptions(merge: true));
+        }, SetOptions(merge: true));
 
         for (var widget in dynamicwidget) {
           final videoref = File(widget.video!.path!);
@@ -352,11 +365,12 @@ class _UploadCourseState extends State<UploadCourse> {
         }
 
         Navigator.of(context).pop();
-
-        SnackBar(
-          content: Text("Course is uploaded"),
-          duration: Duration(milliseconds: 600),
-        );
+        _coursetitle.text = '';
+        _coursedescription.text = '';
+        Fluttertoast.showToast(
+            msg: 'You have successfully Uploaded the course ✨',
+            textColor: Colors.white,
+            backgroundColor: Colors.lightBlue);
       } catch (e) {
         Fluttertoast.showToast(msg: '$e');
       }

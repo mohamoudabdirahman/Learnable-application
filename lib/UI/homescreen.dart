@@ -23,7 +23,7 @@ class Homescreen extends StatefulWidget {
 class _HomescreenState extends State<Homescreen> {
   int CurrentIndex = 0;
 
-  final List<Widget> _pages = [Mainpage(),Explorepage(),Favourites(),Todoscreen(), Accountpage(),];
+  final List<Widget> _pages = [Mainpage(),Explorepage(),Todoscreen(), Accountpage(),];
 
   @override
   Widget build(BuildContext context) {
@@ -49,10 +49,10 @@ class _HomescreenState extends State<Homescreen> {
                 Icons.explore,
                 color: Colors.white,
               ),
-              Icon(
-                Icons.favorite,
-                color: Colors.white,
-              ),
+              // Icon(
+              //   Icons.favorite,
+              //   color: Colors.white,
+              // ),
               Icon(Icons.checklist,color: Colors.white,),
               Icon(
                 Icons.person,

@@ -276,45 +276,59 @@ class _OtpScreenState extends State<OtpScreen> {
                         ),
                         MaterialButton(
                           onPressed: () async {
-                            try {
-                              showDialog(
-                                  context: context,
-                                  builder: (context) {
-                                    return AbsorbPointer(
-                                      absorbing: true,
-                                      child: Container(
-                                        width:
-                                            MediaQuery.of(context).size.width,
-                                        height:
-                                            MediaQuery.of(context).size.height,
-                                        child: Center(
-                                            child: SizedBox(
-                                          height: 50,
-                                          width: 50,
-                                          child: LoadingIndicator(
-                                              indicatorType:
-                                                  Indicator.ballRotateChase),
-                                        )),
-                                      ),
-                                    );
-                                  });
-                              final AuthCredential credentials =
-                                  PhoneAuthProvider.credential(
-                                      verificationId:
-                                          _verificatiocode.toString(),
-                                      smsCode: _field1.text +
-                                          _field2.text +
-                                          _field3.text +
-                                          _field4.text +
-                                          _field5.text +
-                                          _field6.text);
-                              user!.linkWithCredential(credentials);
-                              Navigator.push(
-                                  context,
-                                  MaterialPageRoute(
-                                      builder: ((context) => SetupOne())));
-                            } on Exception catch (e) {
-                              Fluttertoast.showToast(msg: '$e');
+                            if (_field1.text == '' &&
+                                _field2.text == '' &&
+                                _field3.text == '' &&
+                                _field3.text == '' &&
+                                _field4.text == '' &&
+                                _field5.text == '' &&
+                                _field6.text == '') {
+                              Fluttertoast.showToast(
+                                  msg: 'fields cannot be empty');
+                            } else {
+                              try {
+                                showDialog(
+                                    context: context,
+                                    builder: (context) {
+                                      return AbsorbPointer(
+                                        absorbing: true,
+                                        child: Container(
+                                          width:
+                                              MediaQuery.of(context).size.width,
+                                          height: MediaQuery.of(context)
+                                              .size
+                                              .height,
+                                          child: Center(
+                                              child: SizedBox(
+                                            height: 50,
+                                            width: 50,
+                                            child: LoadingIndicator(
+                                                indicatorType:
+                                                    Indicator.ballRotateChase),
+                                          )),
+                                        ),
+                                      );
+                                    });
+
+                                final AuthCredential credentials =
+                                    PhoneAuthProvider.credential(
+                                        verificationId:
+                                            _verificatiocode.toString(),
+                                        smsCode: _field1.text +
+                                            _field2.text +
+                                            _field3.text +
+                                            _field4.text +
+                                            _field5.text +
+                                            _field6.text);
+                                print(_verificatiocode.toString());
+                                user!.linkWithCredential(credentials);
+                                Navigator.push(
+                                    context,
+                                    MaterialPageRoute(
+                                        builder: ((context) => SetupOne())));
+                              } on Exception catch (e) {
+                                Fluttertoast.showToast(msg: '$e');
+                              }
                             }
                           },
                           minWidth: 150,

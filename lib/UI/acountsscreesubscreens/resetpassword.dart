@@ -84,7 +84,7 @@ class _ResetpassState extends State<Resetpass> {
                   controller: _resetemaicontroller,
                   decoration: InputDecoration(
                       border: InputBorder.none,
-                      hintText: 'First Name',
+                      hintText: 'Email',
                       contentPadding: EdgeInsets.only(left: 20)),
                 ),
               ),
